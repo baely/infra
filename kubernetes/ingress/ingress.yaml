@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-test-ingress
+  namespace: default
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "test.kube.baileys.dev"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-test
+                port: 
+                  number: 80
+    - host: "tracker.kube.baileys.dev"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ibbitot-service
+                port:
+                  number: 8080
