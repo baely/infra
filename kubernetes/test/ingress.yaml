@@ -16,13 +16,3 @@ spec:
                 name: nginx-test
                 port: 
                   number: 80
-    - host: "tracker.kube.baileys.dev"
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ibbitot-service
-                port:
-                  number: 8080
