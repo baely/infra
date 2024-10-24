@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coffee-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: coffee
+  template:
+    metadata:
+      labels:
+        app: coffee
+    spec:
+      containers:
+      - name: coffee
+        image: registry.baileys.dev/coffee:latest
+        env:
+        - name: OFFICETRACKER_API_KEY
+          value: ""
+        - name: KAFKA_BROKERS
+          value: ""
