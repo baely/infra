@@ -16,26 +16,3 @@ spec:
                 name: nginx-test
                 port: 
                   number: 80
-<<<<<<< Updated upstream:kubernetes/test/ingress.yaml
-=======
-    - host: "tracker.kube.baileys.dev"
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ibbitot-service
-                port:
-                  number: 8080
-    - host: "caffeine-api.baileys.dev"
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: coffee-service
-                port:
-                  number: 80
->>>>>>> Stashed changes:kubernetes/ingress/ingress.yaml
