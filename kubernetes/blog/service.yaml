@@ -7,8 +7,8 @@ spec:
     app: blog
   ports:
     - protocol: TCP
-      port: 8090
-      targetPort: 8090
+      port: 80
+      targetPort: 8095
 ---
 
 apiVersion: networking.k8s.io/v1
@@ -28,7 +28,7 @@ spec:
               service:
                 name: blog
                 port:
-                  number: 8090
+                  number: 8095
 ---
 
 apiVersion: apps/v1
