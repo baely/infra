@@ -11,6 +11,10 @@ on:
         description: 'Reference to use in the workflow'
         required: true
         type: string
+      token:
+        description: 'GitHub token to use in the workflow'
+        required: true
+        type: string
 
 jobs:
   sync:
@@ -41,4 +45,6 @@ jobs:
         repository: baely/infra
         ref: main
     - name: check ccg?
+      env:
+        GH_TOKEN: ${{ inputs.token }}
       run: gh api "repos/${{ steps.repo-name.outputs.OWNER }}/${{ steps.repo-name.outputs.REPO }}/contents/main.go?ref=${{ inputs.ref }}" | jq -r '.content' | base64 -d
