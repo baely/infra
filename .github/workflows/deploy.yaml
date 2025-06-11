@@ -24,7 +24,7 @@ jobs:
         echo "REPO=$(echo "${{ inputs.repository }}" | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
     - name: Validate owner
       run: |
-        if [ "${{ steps.repo-name.outputs.OWNER }}" -ne "baely" ]
+        if [ "${{ steps.repo-name.outputs.OWNER }}" != "baely" ]
         then
           exit 1
         fi
