@@ -5,4 +5,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: baely/infra/.github/workflows/test.yaml@v1
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Deployment
+      uses: baely/infra/.github/actions/deploy@workflow
