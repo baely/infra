@@ -1,0 +1,12 @@
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment
+      uses: ./actions/deploy.yaml
+      with:
+        service: coffee
+        ref: ${{ github.sha }}
