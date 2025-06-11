@@ -2,13 +2,13 @@ name: Reusable workflow example
 
 on:
   workflow_call:
-  inputs:
-    repository:
-      description: 'Repository to use in the workflow'
-      required: true
-    ref:
-      description: 'Reference to use in the workflow'
-      required: true
+    inputs:
+      repository:
+        description: 'Repository to use in the workflow'
+        required: true
+      ref:
+        description: 'Reference to use in the workflow'
+        required: true
 
 jobs:
   triage:
