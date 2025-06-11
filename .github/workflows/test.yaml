@@ -8,7 +8,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Deployment
-      uses: baely/infra/.github/actions/deploy@v1
+      uses: baely/infra/.github/actions/deploy@workflow
       with:
         service: coffee
         ref: ${{ github.sha }}
