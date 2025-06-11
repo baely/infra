@@ -3,4 +3,6 @@ on:
 
 jobs:
   test:
-    uses: baely/infra/.github/workflows/test.yaml@v1
+    runs-on: ubuntu-latest
+    steps:
+    - uses: baely/infra/.github/workflows/test.yaml@v1
