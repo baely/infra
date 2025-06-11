@@ -20,8 +20,8 @@ jobs:
       id: repo-name
       run: |
 
-        echo "OWNER=$(echo "${{ inputs.repository }}" | cut -d'/' -f1)" >> $GITHUB_ENV
-        echo "REPO=$(echo "${{ inputs.repository }}" | cut -d'/' -f2)" >> $GITHUB_ENV
+        echo "OWNER=$(echo "${{ inputs.repository }}" | cut -d'/' -f1)" >> "$GITHUB_OUTPUT"
+        echo "REPO=$(echo "${{ inputs.repository }}" | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
     - uses: actions/checkout@v4
     - run: |
         echo "This is a reusable workflow example."
