@@ -10,4 +10,5 @@ jobs:
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.ref }}
+    secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
