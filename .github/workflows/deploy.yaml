@@ -56,6 +56,4 @@ jobs:
           exit 1
         fi
        
-        contents=$(echo "$response" | jq -r '.content' | base64 -d)
-
-        echo $contents
+        echo "$response" | jq -r '.content' | base64 -d
