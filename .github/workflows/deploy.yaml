@@ -22,17 +22,9 @@ jobs:
 
         echo "OWNER=$(echo "${{ inputs.repository }}" | cut -d'/' -f1)" >> "$GITHUB_OUTPUT"
         echo "REPO=$(echo "${{ inputs.repository }}" | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
-    - uses: actions/checkout@v4
-    - run: |
-        echo "This is a reusable workflow example."
-        echo "You can use this workflow in other workflows by calling it."
-        echo "For example, you can call it in your main workflow file like this:"
-        echo "jobs:"
-        echo "  my_job:"
-        echo "    uses: baely/infra/.github/workflows/reusable-workflow.yaml@v1"
-        echo "    with:"
-        echo "      repository: \${{ github.repository }}"
-        echo "      ref: \${{ github.ref }}"
-        echo "This will run the reusable workflow with the specified repository and ref."
-        echo "owner: \${{ steps.repo-name.outputs.OWNER }}"
-        echo "repo: \${{ steps.repo-name.outputs.REPO }}"
+    - name: Validate owner
+      run: |
+        if [ "${{ steps.repo-name.outputs.OWNER }}" -ne "baely" ]
+        then
+          exit 1
+        fi
