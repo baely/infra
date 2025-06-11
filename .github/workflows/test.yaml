@@ -2,8 +2,5 @@ on:
   pull_request:
 
 jobs:
-  call-workflow-passing-data:
-    uses: baely/infra/.github/actions/deploy@workflow
-    with:
-      config-path: .github/labeler.yml
-    secrets: inherit
+  test:
+    uses: baely/infra/.github/workflows/test.yaml@v1
