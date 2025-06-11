@@ -5,4 +5,4 @@ on:
 
 jobs:
   call-workflow:
-    uses: baely/infra/.github/workflows/deploy.yaml@v1
+    uses: baely/infra/.github/workflows/deploy.yaml@workflow
