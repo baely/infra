@@ -6,9 +6,11 @@ on:
       repository:
         description: 'Repository to use in the workflow'
         required: true
+        type: string
       ref:
         description: 'Reference to use in the workflow'
         required: true
+        type: string
 
 jobs:
   triage:
