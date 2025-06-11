@@ -15,7 +15,6 @@ on:
       token:
         description: 'GitHub token for authentication'
         required: true
-        type: string
 
 jobs:
   sync:
