@@ -1,6 +1,8 @@
+name: Call a reusable workflow
+
 on:
   pull_request:
 
 jobs:
-  test:
-    uses: baely/infra/.github/workflows/deploy.yaml@workflow
+  call-workflow:
+    uses: baely/infra/.github/workflows/deploy.yaml@v1
