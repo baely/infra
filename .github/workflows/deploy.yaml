@@ -1,4 +1,4 @@
-name: Reusable workflow example
+name: Deploy Service
 
 on:
   workflow_call:
@@ -44,7 +44,18 @@ jobs:
       with:
         repository: baely/infra
         ref: main
-    - name: check ccg?
+    - name: Pull config
       env:
         GH_TOKEN: ${{ secrets.token }}
-      run: gh api "repos/${{ steps.repo-name.outputs.OWNER }}/${{ steps.repo-name.outputs.REPO }}/contents/main.go?ref=${{ inputs.ref }}" | jq -r '.content' | base64 -d
+      run: |
+      
+        response=$(gh api "repos/${{ steps.repo-name.outputs.OWNER }}/${{ steps.repo-name.outputs.REPO }}/contents/main.go?ref=${{ inputs.ref }}")
+
+        if [ $? -ne 0 ]; then
+          echo "Failed to fetch main.go from repository"
+          exit 1
+        fi
+       
+        contents=$(echo "$response" | jq -r '.content' | base64 -d)
+
+        echo $contents
