@@ -26,5 +26,8 @@ jobs:
       run: |
         if [ "${{ steps.repo-name.outputs.OWNER }}" != "baely" ]
         then
+          echo "Invalid repository owner: ${{ steps.repo-name.outputs.OWNER }}"
           exit 1
+        else
+          echo "Valid repository owner: ${{ steps.repo-name.outputs.OWNER }}"
         fi
