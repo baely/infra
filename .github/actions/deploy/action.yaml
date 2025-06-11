@@ -1,3 +1,5 @@
+name: Reusable workflow example
+
 on:
   workflow_call:
     inputs:
@@ -6,14 +8,11 @@ on:
         type: string
 
 jobs:
-  deploy:
+  triage:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ inputs.ref }}
-
-      - name: Test
-        run: |
-          echo "Testing github"
+    - with:
+        configuration-path: ${{ inputs.ref }}
+      run: |
+        echo "This is a reusable workflow example."
+        echo "Configuration path: ${{ inputs.ref }}"
