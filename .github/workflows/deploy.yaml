@@ -35,3 +35,8 @@ jobs:
         else
           echo "Valid repository owner: ${{ steps.repo-name.outputs.OWNER }}"
         fi
+    - name: Checkout infra
+      uses: actions/checkout@v4
+      with:
+        repository: baely/infra
+        ref: main
