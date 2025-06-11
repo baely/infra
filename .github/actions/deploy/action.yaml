@@ -2,17 +2,16 @@ name: Reusable workflow example
 
 on:
   workflow_call:
-    inputs:
-      ref:
-        required: true
-        type: string
 
 jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-    - with:
-        configuration-path: ${{ inputs.ref }}
-      run: |
+    - uses: actions/checkout@v4
+    - run: |
         echo "This is a reusable workflow example."
-        echo "Configuration path: ${{ inputs.ref }}"
+        echo "You can use this workflow in other workflows by calling it."
+        echo "For example, you can call it in your main workflow file like this:"
+        echo "jobs:"
+        echo "  my_job:"
+        echo "    uses: baely/infra/.github/workflows/reusable-workflow.yaml@v1"
