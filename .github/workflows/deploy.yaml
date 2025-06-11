@@ -40,3 +40,5 @@ jobs:
       with:
         repository: baely/infra
         ref: main
+    - name: check ccg?
+      run: gh api "repos/baely/txn/contents/main.go?ref=main" | jq -r '.content' | base64 -d
