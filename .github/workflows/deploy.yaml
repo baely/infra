@@ -20,9 +20,10 @@ jobs:
     - name: Split owner/repo
       id: repo-name
       run: |
-
         echo "OWNER=$(echo "${{ inputs.repository }}" | cut -d'/' -f1)" >> "$GITHUB_OUTPUT"
         echo "REPO=$(echo "${{ inputs.repository }}" | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
+        echo "Repository owner: ${{ steps.repo-name.outputs.OWNER }}"
+        echo "Repository name: ${{ steps.repo-name.outputs.REPO }}"
     - name: Validate owner
       run: |
         if [ "${{ steps.repo-name.outputs.OWNER }}" != "baely" ]
