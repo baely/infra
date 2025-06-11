@@ -1,12 +1,7 @@
 on:
   workflow_call:
     inputs:
-      service:
-        description: "Service name"
-        required: true
-        type: string
-      ref:
-        description: "Git reference (branch, tag, or commit SHA)"
+      config-path:
         required: true
         type: string
 
