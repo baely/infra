@@ -16,6 +16,12 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
+    - name: Split owner/repo
+      id: repo-name
+      run: |
+
+        echo "OWNER=$(echo "${{ inputs.repository }}" | cut -d'/' -f1)" >> $GITHUB_ENV
+        echo "REPO=$(echo "${{ inputs.repository }}" | cut -d'/' -f2)" >> $GITHUB_ENV
     - uses: actions/checkout@v4
     - run: |
         echo "This is a reusable workflow example."
@@ -27,3 +33,6 @@ jobs:
         echo "    with:"
         echo "      repository: \${{ github.repository }}"
         echo "      ref: \${{ github.ref }}"
+        echo "This will run the reusable workflow with the specified repository and ref."
+        echo "owner: \${{ steps.repo-name.outputs.OWNER }}"
+        echo "repo: \${{ steps.repo-name.outputs.REPO }}"
