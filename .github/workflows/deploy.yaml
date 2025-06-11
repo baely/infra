@@ -13,7 +13,8 @@ on:
         type: string
 
 jobs:
-  triage:
+  sync:
+    name: Sync repository
     runs-on: ubuntu-latest
     steps:
     - name: Split owner/repo

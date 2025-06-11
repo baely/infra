@@ -1,10 +1,11 @@
-name: Call a reusable workflow
+name: Deploy
 
 on:
   pull_request:
 
 jobs:
-  call-workflow:
+  deploy:
+    name: Trigger
     uses: baely/infra/.github/workflows/deploy.yaml@workflow
     with:
       repository: ${{ github.repository }}
