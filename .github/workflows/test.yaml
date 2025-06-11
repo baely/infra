@@ -2,8 +2,10 @@ name: Call a reusable workflow
 
 on:
   pull_request:
-  workflow_dispatch:
 
 jobs:
   call-workflow:
     uses: baely/infra/.github/workflows/deploy.yaml@workflow
+    with:
+      repository: ${{ github.repository }}
+      ref: ${{ github.ref }}

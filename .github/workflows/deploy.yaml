@@ -2,6 +2,13 @@ name: Reusable workflow example
 
 on:
   workflow_call:
+  inputs:
+    repository:
+      description: 'Repository to use in the workflow'
+      required: true
+    ref:
+      description: 'Reference to use in the workflow'
+      required: true
 
 jobs:
   triage:
@@ -15,3 +22,6 @@ jobs:
         echo "jobs:"
         echo "  my_job:"
         echo "    uses: baely/infra/.github/workflows/reusable-workflow.yaml@v1"
+        echo "    with:"
+        echo "      repository: \${{ github.repository }}"
+        echo "      ref: \${{ github.ref }}"
