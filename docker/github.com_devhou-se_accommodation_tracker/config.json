@@ -1,0 +1,45 @@
+{
+  "email": {
+    "domain": "mail.devh.se",
+    "from_email": "slopbot@mail.devh.se"
+  },
+  "plugins": [
+    {
+      "type": "sumo",
+      "name": "sumo_november_2025",
+      "enabled": true,
+      "check_interval_minutes": 60,
+      "config": {
+        "url": "https://sumo.pia.jp/en/",
+        "tournament_month": "11",
+        "year": "2025"
+      }
+    },
+    {
+      "type": "direct_booking",
+      "name": "shirakawa_direct_booking_full",
+      "enabled": true,
+      "check_interval_minutes": 60,
+      "config": {
+        "booking_urls": [
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560045&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560023&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560043&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560018&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560025&ty=lim&plan=2&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560026&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560044&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560016&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560022&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560017&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560035&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560019&lan=ENG&kid=00156",
+          "https://www6.489pro.com/asp/489/menu.asp?id=21560047&lan=ENG&kid=00156"
+        ],
+        "target_dates": ["2025-11-04"]
+      }
+    }
+  ],
+  "web_port": 8080,
+  "log_level": "INFO"
+}

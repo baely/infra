@@ -1,0 +1,8 @@
+services:
+  blog:
+    image: registry.baileys.dev/blog:latest
+    restart: unless-stopped
+    labels:
+      - traefik.enabled=true
+      - traefik.http.routers.blog.rule=Host(`blog.baileys.dev`)
+      - traefik.http.services.blog.loadbalancer.server.port=80
