@@ -3,6 +3,6 @@ services:
     image: registry.baileys.dev/ip:latest
     restart: unless-stopped
     labels:
-      - traefik.enabled=true
+      - traefik.enable=true
       - traefik.http.routers.ip.rule=Host(`144.6.89.140`)
       - traefik.http.services.ip.loadbalancer.server.port=8080

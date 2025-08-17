@@ -3,6 +3,6 @@ services:
     image: registry.baileys.dev/eink:v10
     restart: unless-stopped
     labels:
-      - traefik.enabled=true
+      - traefik.enable=true
       - traefik.http.routers.eink.rule=Host(`timetable.baileys.dev`)
       - traefik.http.services.eink.loadbalancer.server.port=8080
