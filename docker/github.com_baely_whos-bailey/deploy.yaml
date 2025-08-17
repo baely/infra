@@ -1,0 +1,21 @@
+services:
+  whos-bailey:
+    image: registry.baileys.dev/ai:latest
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ai.rule=Host(`ai.baileys.app`)
+      - traefik.http.services.ai.loadbalancer.server.port=8080
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/gcp-key.json
+    volumes:
+      - /home/user/homer.json:/app/gcp-key.json:ro
+    secrets:
+      - up_token
+      - officetracker_token
+
+secrets:
+  up_token:
+    file: /home/user/secrets/up_token
+  officetracker_token:
+    file: /home/user/secrets/officetracker_token

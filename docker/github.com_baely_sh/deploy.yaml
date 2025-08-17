@@ -1,0 +1,9 @@
+services:
+  sh:
+    image: registry.baileys.dev/butsh:v4
+    restart: unless-stopped
+    labels:
+      - traefik.enabled=true
+      - traefik.tcp.routers.butsh.entrypoints=ssh
+      - traefik.http.routers.butsh.rule=HostSNI(`*`)
+      - traefik.http.services.butsh.loadbalancer.server.port=22
