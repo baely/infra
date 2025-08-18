@@ -29,6 +29,8 @@ jobs:
         with:
           app-id: ${{ secrets.INFRA_APP_ID }}
           private-key: ${{ secrets.INFRA_APP_SECRET }}
+          owner: baely
+          repositories: infra,${{ inputs.repo }}
       - name: Checkout
         uses: actions/checkout@v4
         with:
