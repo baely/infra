@@ -1,4 +1,4 @@
-name: deploy.yaml
+name: Deploy
 on:
   push:
     branches:
@@ -48,6 +48,7 @@ jobs:
         env:
           COACH_AUTH_TOKEN: ${{ secrets.COACH_AUTH_TOKEN }}
         run: |
-          go run ./tools/cmd/coachassistant start \
+          cd tools
+          go run ./cmd/coachassistant start \
           --service github.com_baely_${{ env.REPO }} \
           --ref ${{ github.sha }}

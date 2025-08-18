@@ -223,6 +223,9 @@ func validateStartRequest(req *squadv1alpha1.StartRequest) error {
 	if req.Ref == "" {
 		return fmt.Errorf("ref is required")
 	}
+	if req.Service == "github.com_baely_infra" {
+		return fmt.Errorf("coach cannot deploy coach")
+	}
 	return nil
 }
 
