@@ -1,3 +1,6 @@
+# Repo: https://github.com/baely/infra
+# Ref: bdd0764ce5bb18cb619f330ddb067650f16368fc
+
 services:
   coach:
     image: registry.baileys.dev/coach:latest
