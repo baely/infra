@@ -10,3 +10,4 @@ services:
     env_file: ".env"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/home/user/github/infra/docker:/app/services"
