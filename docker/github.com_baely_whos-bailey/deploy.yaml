@@ -1,3 +1,6 @@
+# Repo: https://github.com/baely/whos-bailey
+# Ref: 4308beb3e9710cbb024a11e577244ac2895ac815
+
 services:
   whos-bailey:
     image: registry.baileys.dev/ai:latest
