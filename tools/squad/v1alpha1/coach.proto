@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package squad.v1alpha1;
+
+service CoachService {
+  rpc Assemble(AssembleRequest) returns (AssembleResponse);
+  rpc Start(StartRequest) returns (StartResponse);
+}
+
+message AssembleRequest {
+  enum Tag {
+    TAG_UNSPECIFIED = 0;
+    TAG_LATEST = 1;
+    TAG_SHA = 2;
+  }
+
+  string repo = 1;
+  string ref = 2;
+  optional string dockerfile_location = 3;
+  optional string context_location = 4;
+  string image = 5;
+  Tag tag = 6;
+}
+
+message AssembleResponse {
+
+}
+
+message StartRequest {
+  string service = 1;
+  string ref = 2;
+}
+
+message StartResponse {
+
+}
