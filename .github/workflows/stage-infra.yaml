@@ -8,7 +8,10 @@ on:
 jobs:
   stage:
     name: Stage Infra
-    uses: baely/infra/.github/workflows/stage-reuse.yaml@465a026ae9dba2a18cd160994265a7b96665c90c
+    uses: baely/infra/.github/workflows/stage.yaml@e744e9fb5757638c565f665044613b0a3a22ef43
     with:
       repo: infra
       ref: ${{ github.sha }}
+    secrets:
+      INFRA_APP_ID: ${{ secrets.INFRA_APP_ID }}
+      INFRA_APP_SECRET: ${{ secrets.INFRA_APP_SECRET }}
