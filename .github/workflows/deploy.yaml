@@ -3,40 +3,45 @@ on:
   push:
     branches:
       - main
-      - feat/cicd
-
-env:
-  REPO: infra
 
 jobs:
-  build:
-    name: Build Image
+  detect-services:
+    name: Detect Changed Services
     runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.changes.outputs.services }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Go
-        uses: actions/setup-go@v5
         with:
-          go-version-file: tools/go.mod
-      - name: Run Builder
-        env:
-          COACH_AUTH_TOKEN: ${{ secrets.COACH_AUTH_TOKEN }}
+          fetch-depth: 2
+      - name: Get changed docker services
+        id: changes
         run: |
-          cd tools
-          go run ./cmd/coachassistant assemble \
-          --repo ${{ env.REPO }} \
-          --ref ${{ github.sha }} \
-          --image ${{ env.REPO }} \
-          --tag sha \
-          --dockerfile tools/Dockerfile \
-          --context tools
+          # Get list of changed files in docker/ directory
+          changed_files=$(git diff --name-only HEAD~1 HEAD | grep "^docker/" || true)
+          
+          if [ -z "$changed_files" ]; then
+            echo "services=[]" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Extract service names from paths like docker/github.com_baely_service/
+          services=$(echo "$changed_files" | sed -n 's|^docker/\([^/]*\)/.*|\1|p' | sort -u)
+          
+          # Convert to JSON array
+          json_services=$(echo "$services" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "services=$json_services" >> $GITHUB_OUTPUT
+          echo "Detected services: $json_services"
 
   deploy:
     name: Deploy Service
     runs-on: ubuntu-latest
-    needs:
-      - build
+    needs: detect-services
+    if: needs.detect-services.outputs.services != '[]'
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-services.outputs.services) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,5 +55,5 @@ jobs:
         run: |
           cd tools
           go run ./cmd/coachassistant start \
-          --service github.com_baely_${{ env.REPO }} \
+          --service ${{ matrix.service }} \
           --ref ${{ github.sha }}

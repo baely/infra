@@ -1,8 +1,6 @@
 name: Stage Merge
 on: pull_request_target
 
-permissions: write-all
-
 jobs:
   merge:
     name: Merge PR
