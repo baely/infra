@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - tools/**
 
 jobs:
   stage:
