@@ -12,6 +12,12 @@ jobs:
         with:
           app-id: ${{ secrets.INFRA_APP_ID }}
           private-key: ${{ secrets.INFRA_APP_SECRET }}
+      - name: Generate Approver App Token
+        id: approver-app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APPROVER_APP_ID }}
+          private-key: ${{ secrets.APROVER_APP_SECRET }}
       - name: Checkout
         uses: actions/checkout@v4
       - name: Filter Config Changes
@@ -25,7 +31,7 @@ jobs:
         if: steps.changes.outputs.src == 'true'
         uses: hmarr/auto-approve-action@v4
         with:
-          github-token: ${{ steps.app-token.outputs.token }}
+          github-token: ${{ steps.approver-app-token.outputs.token }}
       - name: Automerge
         if: github.event.pull_request.user.login == 'github-actions[bot]'
         run: gh pr merge --auto --squash "$PR_URL"
