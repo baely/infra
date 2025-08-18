@@ -34,6 +34,7 @@ jobs:
         with:
           repository: baely/infra
           ref: main
+          token: ${{ steps.app-token.outputs.token }}
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -70,4 +71,4 @@ jobs:
             --title "Update config for ${{ inputs.repo }}" \
             --body "Updated deployment config for ${{ inputs.repo }} at ref ${{ inputs.ref }}"
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
