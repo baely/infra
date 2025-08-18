@@ -17,7 +17,7 @@ jobs:
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.APPROVER_APP_ID }}
-          private-key: ${{ secrets.APROVER_APP_SECRET }}
+          private-key: ${{ secrets.APPROVER_APP_SECRET }}
       - name: Checkout
         uses: actions/checkout@v4
       - name: Filter Config Changes
@@ -33,7 +33,7 @@ jobs:
         with:
           github-token: ${{ steps.approver-app-token.outputs.token }}
       - name: Automerge
-        if: github.event.pull_request.user.login == 'github-actions[bot]'
+        if: github.event.pull_request.user.login == 'baileys-infra-manager[bot]'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
