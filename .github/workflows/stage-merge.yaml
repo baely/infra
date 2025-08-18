@@ -1,0 +1,31 @@
+name: Stage Merge
+on: pull_request_target
+
+permissions: write-all
+
+
+jobs:
+  merge:
+    name: Merge PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Filter Config Changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'docker/**'
+      - name: Approve
+        if: steps.changes.outputs.src == 'true'
+        uses: hmarr/auto-approve-action@v4
+        with:
+          github-token: ${{ secrets.APPROVER_PAT }}
+      - name: Automerge
+        if: github.event.pull_request.user.login == 'github-actions[bot]'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{ secrets.APPROVER_PAT }}
