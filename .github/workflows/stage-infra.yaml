@@ -1,0 +1,16 @@
+name: Stage Infra
+on:
+  push:
+    branches:
+      - main
+      - feat/cicd
+    paths:
+      - config/**
+
+jobs:
+  stage:
+    name: Stage Infra
+    uses: baely/infra/.github/workflows/stage-reuse.yaml@465a026ae9dba2a18cd160994265a7b96665c90c
+    with:
+      repo: infra
+      ref: ${{ github.sha }}
