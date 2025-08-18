@@ -1,0 +1,12 @@
+# Repo: https://github.com/baely/txn
+# Ref: 206e97f5dadf802a93bf01644232445ef1393a19
+
+services:
+  txn:
+    image: registry.baileys.dev/txn:latest
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.txn.rule=Host(`caffeine-api.baileys.dev`) || Host(`caffeine.baileys.app`) || Host(`baileyneeds.coffee`) || Host(`isbaileybutlerintheoffice.today`) || Host(`events.baileys.dev`)
+      - traefik.http.services.txn.loadbalancer.server.port=8080
+    env_file: ".env"
