@@ -23,7 +23,8 @@ jobs:
         env:
           COACH_AUTH_TOKEN: ${{ secrets.COACH_AUTH_TOKEN }}
         run: |
-          go run ./tools/cmd/coachassistant assemble \
+          cd tools
+          go run ./cmd/coachassistant assemble \
           --repo ${{ env.REPO }} \
           --ref ${{ github.sha }} \
           --image ${{ env.REPO }} \
