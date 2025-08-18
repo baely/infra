@@ -8,7 +8,7 @@ on:
 jobs:
   stage:
     name: Stage Infra
-    uses: baely/infra/.github/workflows/stage.yaml@82178bfc84920d605b66616876a41a41f8d07926
+    uses: baely/infra/.github/workflows/stage.yaml@2a10f6b193716601c72ec1635ae8f343c02a5ef0
     with:
       repo: infra
       ref: ${{ github.sha }}
