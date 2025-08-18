@@ -12,25 +12,36 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/go-github/v74/github"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 
 	squadv1alpha1 "github.com/baely/infra/tools/gen/squad/v1alpha1"
 )
 
 func main() {
+	authToken := os.Getenv("COACH_AUTH_TOKEN")
+	if authToken == "" {
+		log.Fatal("COACH_AUTH_TOKEN environment variable is required")
+	}
+
 	service := &coachService{}
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(authInterceptor(authToken)),
+	)
 	squadv1alpha1.RegisterCoachServiceServer(server, service)
 
-	lis, err := net.Listen("tcp", "0.0.0.0:8086")
+	lis, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {
 		log.Fatalf("failed to start tcp listener: %v", err)
 	}
 
-	fmt.Println("listening on :8086")
+	fmt.Println("listening on :8080")
 
 	if err = server.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
@@ -102,6 +113,10 @@ func (s *coachService) Start(ctx context.Context, req *squadv1alpha1.StartReques
 
 	if err := validateDeployFile(workDir); err != nil {
 		return nil, err
+	}
+
+	if err := s.runDockerCompose(workDir, "pull"); err != nil {
+		return nil, fmt.Errorf("failed to pull images: %w", err)
 	}
 
 	if err := s.runDockerCompose(workDir, "up", "-d"); err != nil {
@@ -254,4 +269,25 @@ func downloadFileToPath(url, filepath string) error {
 	}
 
 	return os.WriteFile(filepath, b, 0644)
+}
+
+func authInterceptor(expectedToken string) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			return nil, status.Error(codes.Unauthenticated, "metadata not found")
+		}
+
+		authHeader := md.Get("authorization")
+		if len(authHeader) == 0 {
+			return nil, status.Error(codes.Unauthenticated, "authorization header required")
+		}
+
+		token := strings.TrimPrefix(authHeader[0], "Bearer ")
+		if token != expectedToken {
+			return nil, status.Error(codes.Unauthenticated, "invalid token")
+		}
+
+		return handler(ctx, req)
+	}
 }

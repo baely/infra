@@ -1,0 +1,51 @@
+name: deploy.yaml
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REPO: infra
+
+jobs:
+  build:
+    name: Build Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/go.mod
+      - name: Run Builder
+        env:
+          COACH_AUTH_TOKEN: ${{ secrets.COACH_AUTH_TOKEN }}
+        run: |
+          go run ./tools/cmd/coachassistant assemble \
+          --repo ${{ env.REPO }} \
+          --ref ${{ github.sha }} \
+          --image ${{ env.REPO }} \
+          --tag sha \
+          --dockerfile tools/Dockerfile \
+          --context tools
+
+  deploy:
+    name: Deploy Service
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/go.mod
+      - name: Deploy Service
+        env:
+          COACH_AUTH_TOKEN: ${{ secrets.COACH_AUTH_TOKEN }}
+        run: |
+          go run ./tools/cmd/coachassistant start \
+          --service github.com_baely_${{ env.REPO }} \
+          --ref ${{ github.sha }}
