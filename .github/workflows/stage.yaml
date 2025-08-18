@@ -70,4 +70,4 @@ jobs:
             --title "Update config for ${{ inputs.repo }}" \
             --body "Updated deployment config for ${{ inputs.repo }} at ref ${{ inputs.ref }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
