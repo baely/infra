@@ -97,81 +97,136 @@ func (s *coachService) Assemble(ctx context.Context, req *squadv1alpha1.Assemble
 }
 
 func (s *coachService) Start(ctx context.Context, req *squadv1alpha1.StartRequest) (*squadv1alpha1.StartResponse, error) {
+	log.Printf("Starting deployment for service: %s, ref: %s", req.Service, req.Ref)
+	
 	if err := validateStartRequest(req); err != nil {
+		log.Printf("Validation failed for start request: %v", err)
 		return nil, err
 	}
+	log.Printf("Start request validation passed")
 
+	log.Printf("Downloading service config for %s", req.Service)
 	workDir, err := s.downloadServiceConfig(ctx, req.Service, req.Ref)
 	if err != nil {
+		log.Printf("Failed to download service config: %v", err)
 		return nil, fmt.Errorf("failed to download service config: %w", err)
 	}
+	log.Printf("Service config downloaded to: %s", workDir)
+	
 	defer func() {
+		log.Printf("Cleaning up temp directory: %s", workDir)
 		if err := os.RemoveAll(workDir); err != nil {
 			log.Printf("Warning: failed to cleanup temp directory %s: %v", workDir, err)
+		} else {
+			log.Printf("Successfully cleaned up temp directory")
 		}
 	}()
 
+	log.Printf("Validating deploy file in: %s", workDir)
 	if err := validateDeployFile(workDir); err != nil {
+		log.Printf("Deploy file validation failed: %v", err)
 		return nil, err
 	}
+	log.Printf("Deploy file validation passed")
 
+	log.Printf("Pulling docker images for service: %s", req.Service)
 	if err := s.runDockerCompose(workDir, "pull"); err != nil {
+		log.Printf("Failed to pull docker images: %v", err)
 		return nil, fmt.Errorf("failed to pull images: %w", err)
 	}
+	log.Printf("Successfully pulled docker images")
 
+	log.Printf("Starting service containers for: %s", req.Service)
 	if err := s.runDockerCompose(workDir, "up", "-d"); err != nil {
+		log.Printf("Failed to start service containers: %v", err)
 		return nil, fmt.Errorf("failed to start service: %w", err)
 	}
+	log.Printf("Successfully started service: %s", req.Service)
 
 	return &squadv1alpha1.StartResponse{}, nil
 }
 
 func (s *coachService) runDockerCompose(workDir string, args ...string) error {
-	cmd := exec.Command("docker", append([]string{"compose", "-f", "deploy.yaml"}, args...)...)
+	fullArgs := append([]string{"compose", "-f", "deploy.yaml"}, args...)
+	log.Printf("Running docker command: docker %v", fullArgs)
+	log.Printf("Working directory: %s", workDir)
+	
+	cmd := exec.Command("docker", fullArgs...)
 	cmd.Dir = workDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	
+	if err := cmd.Run(); err != nil {
+		log.Printf("Docker compose command failed: %v", err)
+		return err
+	}
+	
+	log.Printf("Docker compose command completed successfully")
+	return nil
 }
 
 func (s *coachService) downloadServiceConfig(ctx context.Context, serviceName, ref string) (string, error) {
+	log.Printf("Downloading service config for %s at ref %s", serviceName, ref)
 	client := github.NewClient(nil)
 
 	servicePath := path.Join("docker", serviceName)
+	log.Printf("Fetching contents from GitHub path: %s", servicePath)
 	_, dirContent, _, err := client.Repositories.GetContents(ctx, "baely", "infra", servicePath, &github.RepositoryContentGetOptions{
 		Ref: ref,
 	})
 	if err != nil {
+		log.Printf("Failed to get GitHub contents for %s: %v", servicePath, err)
 		return "", fmt.Errorf("failed to get service directory contents: %w", err)
 	}
 
 	if len(dirContent) == 0 {
+		log.Printf("No files found in GitHub service directory: %s", servicePath)
 		return "", fmt.Errorf("no files found in service directory %s", servicePath)
 	}
+	log.Printf("Found %d files in GitHub service directory", len(dirContent))
 
 	tempDir, err := os.MkdirTemp("", fmt.Sprintf("coach-service-%s-", serviceName))
 	if err != nil {
+		log.Printf("Failed to create temp directory: %v", err)
 		return "", fmt.Errorf("failed to create temp directory: %w", err)
 	}
+	log.Printf("Created temp directory: %s", tempDir)
 
 	serviceDir := filepath.Join(tempDir, serviceName)
 	if err := os.MkdirAll(serviceDir, 0755); err != nil {
+		log.Printf("Failed to create service subdirectory %s: %v", serviceDir, err)
 		return "", fmt.Errorf("failed to create service subdirectory: %w", err)
 	}
+	log.Printf("Created service directory: %s", serviceDir)
 
+	downloadedCount := 0
 	for _, content := range dirContent {
 		rawURL := content.GetDownloadURL()
 		if rawURL == "" {
+			log.Printf("Skipping file %s (no download URL)", content.GetName())
 			continue
 		}
 
 		filename := filepath.Join(serviceDir, content.GetName())
+		log.Printf("Downloading file: %s -> %s", content.GetName(), filename)
 		if err := downloadFileToPath(rawURL, filename); err != nil {
 			log.Printf("Warning: failed to download file %s: %v", content.GetName(), err)
 			continue
 		}
+		downloadedCount++
+	}
+	log.Printf("Successfully downloaded %d files from GitHub", downloadedCount)
+
+	// Copy files from mounted services directory if it exists
+	mountedServicePath := fmt.Sprintf("/app/services/%s", serviceName)
+	log.Printf("Checking for mounted service files at: %s", mountedServicePath)
+	if err := copyMountedServiceFiles(mountedServicePath, serviceDir); err != nil {
+		log.Printf("Warning: failed to copy mounted service files from %s: %v", mountedServicePath, err)
+	} else {
+		log.Printf("Successfully copied mounted service files from: %s", mountedServicePath)
 	}
 
+	log.Printf("Service config setup complete for %s at: %s", serviceName, serviceDir)
 	return serviceDir, nil
 }
 
@@ -217,15 +272,22 @@ func validateAssembleRequest(req *squadv1alpha1.AssembleRequest) error {
 }
 
 func validateStartRequest(req *squadv1alpha1.StartRequest) error {
+	log.Printf("Validating start request - Service: %s, Ref: %s", req.Service, req.Ref)
+	
 	if req.Service == "" {
+		log.Printf("Validation failed: service name is required")
 		return fmt.Errorf("service name is required")
 	}
 	if req.Ref == "" {
+		log.Printf("Validation failed: ref is required")
 		return fmt.Errorf("ref is required")
 	}
 	if req.Service == "github.com_baely_infra" {
+		log.Printf("Validation failed: coach cannot deploy itself")
 		return fmt.Errorf("coach cannot deploy coach")
 	}
+	
+	log.Printf("Start request validation successful")
 	return nil
 }
 
@@ -249,9 +311,14 @@ func getStringOrDefault(ptr *string, defaultValue string) string {
 
 func validateDeployFile(workDir string) error {
 	deployYamlPath := filepath.Join(workDir, "deploy.yaml")
+	log.Printf("Validating deploy file exists at: %s", deployYamlPath)
+	
 	if _, err := os.Stat(deployYamlPath); os.IsNotExist(err) {
+		log.Printf("Deploy file validation failed: deploy.yaml not found at %s", deployYamlPath)
 		return fmt.Errorf("deploy.yaml not found in service directory")
 	}
+	
+	log.Printf("Deploy file validation successful: found deploy.yaml")
 	return nil
 }
 
@@ -272,6 +339,66 @@ func downloadFileToPath(url, filepath string) error {
 	}
 
 	return os.WriteFile(filepath, b, 0644)
+}
+
+func copyMountedServiceFiles(sourcePath, destPath string) error {
+	log.Printf("Attempting to copy mounted files from %s to %s", sourcePath, destPath)
+	
+	if _, err := os.Stat(sourcePath); os.IsNotExist(err) {
+		log.Printf("Mounted service directory does not exist: %s", sourcePath)
+		return nil
+	}
+	log.Printf("Found mounted service directory: %s", sourcePath)
+
+	copiedFiles := 0
+	copiedDirs := 0
+	
+	err := filepath.Walk(sourcePath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("Error walking path %s: %v", path, err)
+			return err
+		}
+
+		relPath, err := filepath.Rel(sourcePath, path)
+		if err != nil {
+			log.Printf("Error getting relative path for %s: %v", path, err)
+			return err
+		}
+
+		destFile := filepath.Join(destPath, relPath)
+
+		if info.IsDir() {
+			log.Printf("Creating directory: %s", destFile)
+			if err := os.MkdirAll(destFile, info.Mode()); err != nil {
+				log.Printf("Failed to create directory %s: %v", destFile, err)
+				return err
+			}
+			copiedDirs++
+			return nil
+		}
+
+		log.Printf("Copying file: %s -> %s (size: %d bytes)", path, destFile, info.Size())
+		data, err := os.ReadFile(path)
+		if err != nil {
+			log.Printf("Failed to read file %s: %v", path, err)
+			return err
+		}
+
+		if err := os.WriteFile(destFile, data, info.Mode()); err != nil {
+			log.Printf("Failed to write file %s: %v", destFile, err)
+			return err
+		}
+		copiedFiles++
+		return nil
+	})
+	
+	if err != nil {
+		log.Printf("Error during mounted file copy operation: %v", err)
+		return err
+	}
+	
+	log.Printf("Successfully copied %d files and %d directories from mounted service directory", copiedFiles, copiedDirs)
+	return nil
 }
 
 func authInterceptor(expectedToken string) grpc.UnaryServerInterceptor {
