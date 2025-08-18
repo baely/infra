@@ -1,5 +1,5 @@
 # Repo: https://github.com/baely/infra
-# Ref: 58dc597c9d4426fb147f7ff0c23e49781016d3cb
+# Ref: 61d1cf706030db571322e1cfc0fc788035094769
 
 services:
   coach:
@@ -13,3 +13,4 @@ services:
     env_file: ".env"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/home/user/github/infra/docker:/app/services"
