@@ -1,0 +1,74 @@
+name: Stage
+on:
+  workflow_call:
+    inputs:
+      repo:
+        type: string
+        description: "Repository name to scan"
+        required: true
+      ref:
+        type: string
+        description: "Git reference to scan"
+        required: true
+    secrets:
+      INFRA_APP_ID:
+        description: "GitHub App ID"
+        required: true
+      INFRA_APP_SECRET:
+        description: "GitHub App private key"
+        required: true
+
+jobs:
+  stage:
+    name: Stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate App Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.INFRA_APP_ID }}
+          private-key: ${{ secrets.INFRA_APP_SECRET }}
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: baely/infra
+          ref: main
+          token: ${{ steps.app-token.outputs.token }}
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/go.mod
+      - name: Scout Config
+        run: |
+          cd tools
+          go run ./cmd/scout repo ${{ inputs.repo }} ${{ inputs.ref }}
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+            echo "No changes detected"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "baileys-infra-manager"
+          git config user.email "no-reply@isbaileybutlerintheoffice.today"
+          
+          branch_name="scout/${{ inputs.repo }}-$(date +%s)"
+          git checkout -b "$branch_name"
+          git add .
+          git commit -m "Update config for ${{ inputs.repo }} at ${{ inputs.ref }}"
+          git push origin "$branch_name"
+          
+          gh pr create \
+            --title "Update config for ${{ inputs.repo }}" \
+            --body "Updated deployment config for ${{ inputs.repo }} at ref ${{ inputs.ref }}"
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
