@@ -1,0 +1,15 @@
+# Repo: https://github.com/baely/infra
+# Ref: 0ba0e23b780673a4455287e40490265faaccd86d
+
+services:
+  coach:
+    image: registry.baileys.dev/coach:latest
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.coach.rule=Host(`coach.baileys.dev`)
+      - traefik.http.services.coach.loadbalancer.server.scheme=h2c
+      - traefik.http.services.coach.loadbalancer.server.port=8080
+    env_file: ".env"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
