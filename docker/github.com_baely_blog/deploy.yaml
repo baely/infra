@@ -6,6 +6,6 @@ services:
       - traefik.enable=true
       - traefik.http.routers.blog.rule=Host(`blog.baileys.dev`)
       - traefik.http.services.blog.loadbalancer.server.port=80
-      - baileys.public.url="https://blog.baileys.dev"
-      - baileys.public.title="Blog"
-      - baileys.public.description="Tech and other stuff"
+      - baileys.public.url=https://blog.baileys.dev
+      - baileys.public.title=Blog
+      - baileys.public.description=Tech and other stuff
