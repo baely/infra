@@ -11,6 +11,7 @@ services:
       - traccardb:/opt/traccar/data
     labels:
       - traefik.enable=true
+      - traefik.docker.network=web
       - traefik.http.routers.traccar-web.rule=Host(`track.baileys.dev`)
       - traefik.http.routers.traccar-web.service=traccar-web
       - traefik.http.services.traccar-web.loadbalancer.server.port=8082
