@@ -1,5 +1,3 @@
-# Temporal server + UI (temporal.baileys.dev)
-# Versions are pinned inline (previously via .env). No secrets.
 name: temporal
 
 services:

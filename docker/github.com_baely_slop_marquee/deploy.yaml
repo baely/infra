@@ -1,6 +1,4 @@
 # Repo: https://github.com/baely/slop (marquee/)
-# Marquee — Letterboxd watchlist → Radarr (marquee.home.baileys.app, internal)
-# .env provides TMDB_BEARER and RADARR_API_KEY.
 name: marquee
 
 services:
@@ -10,12 +8,10 @@ services:
     restart: unless-stopped
     env_file: ".env"
     environment:
-      TMDB_API_KEY: "" # using TMDB_BEARER (v4 read token) instead
+      TMDB_API_KEY: ""
       RADARR_URL: "http://192.168.0.82:7878"
-      # Optional: auto-detected from Radarr if omitted
       RADARR_QUALITY_PROFILE_ID: ""
       RADARR_ROOT_FOLDER: ""
-      # Letterboxd ongoing sync (public RSS)
       LETTERBOXD_USERNAME: "baely"
       SYNC_INTERVAL_MIN: "60"
       OWNER: "bailey"

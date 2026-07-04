@@ -1,6 +1,3 @@
-# Chatwoot (chat.baileys.app)
-# .env is the standard Chatwoot environment file (SECRET_KEY_BASE, SMTP, etc.)
-# and also provides POSTGRES_PASSWORD / REDIS_PASSWORD used below.
 name: chatwoot
 
 services:

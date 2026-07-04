@@ -1,6 +1,4 @@
 # Repo: https://github.com/baely/slop (officetracker-mirror/)
-# Read-only mirror of officetracker.com.au (officetracker.baileys.app)
-# .env provides OFFICETRACKER_TOKEN.
 name: officetracker-mirror
 
 services:

@@ -1,6 +1,4 @@
 # Repo: https://github.com/baely/amenu
-# Menu — upcoming menu for the week (menu.baileys.app)
-# .env provides AMENU_AUTH_KEY and AMENU_ENCRYPT_KEY.
 name: menu
 
 services:
@@ -25,7 +23,7 @@ services:
 
 volumes:
   amenu-data:
-    external: true # pre-existing volume from the original docker run deployment
+    external: true
 
 networks:
   menu-net:

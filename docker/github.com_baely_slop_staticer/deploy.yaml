@@ -1,8 +1,4 @@
 # Repo: https://github.com/baely/slop (staticer/)
-# Staticer — static site hosting (lab.baileys.app + wildcard/custom-domain fallback)
-# Runs 10 replicas behind traefik. Reconstructed from the running containers —
-# the old on-disk compose file in the slop checkout had drifted from reality.
-# .env provides UPLOAD_SECRET and ADMIN_SECRET.
 name: staticer
 
 services:
@@ -17,12 +13,12 @@ services:
       SERVER_HOST: "lab.baileys.app"
       SITES_DIR: /app/sites
       DATABASE_PATH: /app/data/staticer.db
-      MAX_UPLOAD_SIZE: "1048576000" # 1GB
-      MAX_EXTRACTED_SIZE: "5242880000" # 5GB
+      MAX_UPLOAD_SIZE: "1048576000"
+      MAX_EXTRACTED_SIZE: "5242880000"
       MAX_FILES_PER_SITE: "10000"
       RATE_LIMIT_UPLOADS: "10"
     ports:
-      - "8080" # ephemeral host port per replica
+      - "8080"
     volumes:
       - staticer-data:/app/data
       - staticer-sites:/app/sites
@@ -30,7 +26,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.staticer.rule=Host(`lab.baileys.app`) || HostRegexp(`{subdomain:[a-z]+-[a-z]+}.lab.baileys.app`) || HostRegexp(`^.+\\.lab\\.baileys\\.app$$`)"
       - "traefik.http.services.staticer.loadbalancer.server.port=8080"
-      # catch-all fallback for custom domains, lowest priority
       - "traefik.http.routers.staticer-fallback.rule=HostRegexp(`{catchall:.*}`) || HostRegexp(`^.+$$`)"
       - "traefik.http.routers.staticer-fallback.priority=1"
       - "traefik.http.routers.staticer-fallback.service=staticer"

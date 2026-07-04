@@ -17,11 +17,11 @@ services:
       - txn-data:/data
     networks:
       - default
-      - pg # shared postgres — .env should use DB_HOST=pg_transactions
+      - pg
 
 volumes:
   txn-data:
 
 networks:
   pg:
-    external: true # created by the pg_transactions stack
+    external: true

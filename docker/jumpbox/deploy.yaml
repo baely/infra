@@ -1,12 +1,10 @@
-# Webtop jumpbox (jump.baileys.dev)
-# .env provides PASSWORD (webtop login for CUSTOM_USER).
 name: jumpbox
 
 services:
   jumpbox:
     image: lscr.io/linuxserver/webtop:ubuntu-xfce
     container_name: jumpbox
-    restart: "no" # matches how it currently runs; bump to unless-stopped if it should survive reboots
+    restart: "no"
     env_file: ".env"
     environment:
       PUID: "1000"
@@ -24,7 +22,7 @@ services:
 
 volumes:
   webtop:
-    external: true # pre-existing volume from the original docker run deployment
+    external: true
 
 networks:
   web:

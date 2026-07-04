@@ -1,6 +1,4 @@
 # Repo: https://github.com/baely/slop (messenger/)
-# Hermes — contact form backed by Chatwoot (hermes.baileys.app)
-# .env provides CHATWOOT_API_TOKEN.
 name: hermes
 
 services:
@@ -22,7 +20,7 @@ services:
       - baileys.public.title=Hermes
       - baileys.public.description=Message me
     networks:
-      - web # previously on the default bridge; web keeps traefik routing
+      - web
 
 networks:
   web:

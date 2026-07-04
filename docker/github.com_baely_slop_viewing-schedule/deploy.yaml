@@ -1,6 +1,4 @@
 # Repo: https://github.com/baely/slop (viewing-schedule/)
-# Viewing Schedule (viewing.baileys.app)
-# .env provides TMDB_TOKEN.
 name: viewing-schedule
 
 services:
@@ -13,9 +11,7 @@ services:
       DB_PATH: "/data/viewing.db"
       TITLE: "Viewing Schedule"
       DATE_RANGE: ""
-      # TRUST_PROXY=1 because traefik sets X-Forwarded-For (admin panel IP allow-list).
       TRUST_PROXY: "1"
-      # Letterboxd diary sync (history view + CSV export)
       LETTERBOXD_USER: "baely"
       SYNC_INTERVAL: "6h"
     labels:

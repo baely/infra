@@ -1,8 +1,3 @@
-# Ultimate Plex Stack — media stack (Plex, Jellyfin, *arr, qBittorrent+VPN, ...)
-# Originally from https://github.com/DonMcD/ultimate-plex-stack
-# .env provides PUID/GUID/TZ/BASE_PATH/MEDIA_SHARE and the VPN credentials.
-# App config data lives under ${BASE_PATH}/<app>/config (bind mounts, outside the repo).
-# Note: prefetcharr was removed (it had been crashlooping and is no longer wanted).
 name: ultimate-plex-stack
 
 networks:
@@ -10,7 +5,6 @@ networks:
     external: true
 
 services:
-  #Plex - used to display the media
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
@@ -22,14 +16,13 @@ services:
       - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM}
     devices:
-      - /dev/dri:/dev/dri #Required for plex HW transcoding / QuickSync
+      - /dev/dri:/dev/dri
     volumes:
       - ${BASE_PATH}/plex/config:/config
       - ${MEDIA_SHARE}/media/tv:/tv
       - ${MEDIA_SHARE}/media/movies:/movies
     restart: unless-stopped
 
-  #Jellyfin - alternative media server to Plex
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
@@ -46,7 +39,7 @@ services:
       - PGID=${GUID}
       - TZ=${TZ}
     devices:
-      - /dev/dri:/dev/dri #Required for HW transcoding
+      - /dev/dri:/dev/dri
     volumes:
       - ${BASE_PATH}/jellyfin/config:/config
       - ${MEDIA_SHARE}/media/tv:/data/tvshows
@@ -55,7 +48,6 @@ services:
       - 8096:8096
     restart: unless-stopped
 
-  #Radarr - used to find movies automatically
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
@@ -73,12 +65,11 @@ services:
       - TZ=${TZ}
     volumes:
       - ${BASE_PATH}/radarr/config:/config
-      - ${MEDIA_SHARE}:/data #Access to the entire share
+      - ${MEDIA_SHARE}:/data
     ports:
       - 7878:7878
     restart: unless-stopped
 
-  #Sonarr - used to find tv shows automatically
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -96,12 +87,11 @@ services:
       - TZ=${TZ}
     volumes:
       - ${BASE_PATH}/sonarr/config:/config
-      - ${MEDIA_SHARE}:/data #Access to the entire share
+      - ${MEDIA_SHARE}:/data
     ports:
       - 8989:8989
     restart: unless-stopped
 
-  #Prowlarr - manages your Sonarr, Radarr and download client
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -123,7 +113,6 @@ services:
       - 9696:9696
     restart: unless-stopped
 
-  #FlareSolverr - proxy server to bypass Cloudflare and DDoS-GUARD protection (used by Prowlarr)
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
@@ -144,7 +133,6 @@ services:
       - 8191:8191
     restart: unless-stopped
 
-  #Autobrr - used to grab torrents using the trackers IRC channel
   autobrr:
     container_name: autobrr
     image: ghcr.io/autobrr/autobrr:latest
@@ -166,7 +154,6 @@ services:
     ports:
       - 7474:7474
 
-  #Seerr - allows users to request media on their own
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     init: true
@@ -183,10 +170,10 @@ services:
       - PUID=${PUID}
       - PGID=${GUID}
       - TZ=${TZ}
-      - PORT=5055 #optional
+      - PORT=5055
     volumes:
       - ${BASE_PATH}/seer/config:/app/config
-      - ${MEDIA_SHARE}:/data #Access to the entire share
+      - ${MEDIA_SHARE}:/data
     restart: unless-stopped
 
   qbit-vpn:
@@ -196,38 +183,37 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - PUID=0 # Required | Leave 0 because this container requires admin priviledges
-      - PGID=0 # Required | Leave 0 because this container requires admin priviledges
-      - UMASK=000 # Required
-      - TZ=${TZ} # Required
-      - WEBUI_PORT=8090 # Required, default 8080
-      - VPN_ENABLED=yes # Required | yes or no
-      - VPN_USER=${VPN_USER} # Optional if VPN_ENABLED=no
-      - VPN_PASS=${VPN_PASS} # Optional if VPN_ENABLED=no
-      - VPN_PROV=pia # Optional if VPN_ENABLED=no
-      - VPN_CLIENT=wireguard # Optional if VPN_ENABLED=no | Can be wireguard or openvpn
-      - STRICT_PORT_FORWARD=yes # Optional if VPN_ENABLED=no
-      - LAN_NETWORK=192.168.0.0/24 # Change this to your local network
-      - ENABLE_STARTUP_SCRIPTS=no # Optional | yes or no
+      - PUID=0
+      - PGID=0
+      - UMASK=000
+      - TZ=${TZ}
+      - WEBUI_PORT=8090
+      - VPN_ENABLED=yes
+      - VPN_USER=${VPN_USER}
+      - VPN_PASS=${VPN_PASS}
+      - VPN_PROV=pia
+      - VPN_CLIENT=wireguard
+      - STRICT_PORT_FORWARD=yes
+      - LAN_NETWORK=192.168.0.0/24
+      - ENABLE_STARTUP_SCRIPTS=no
       - NAME_SERVERS=1.1.1.1,1.0.0.1
       - ENABLE_PRIVOXY=yes
     sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1 # Required if using wireguard
-    privileged: true # Required if using wireguard
+      - net.ipv4.conf.all.src_valid_mark=1
+    privileged: true
     ports:
-      - 8090:8090 # WebUI
-      - 8118:8118 # Privoxy
-      - 58946:58946 # Torrenting (TCP)
-      - 58946:58946/udp # Torrenting (UDP)
+      - 8090:8090
+      - 8118:8118
+      - 58946:58946
+      - 58946:58946/udp
     devices:
-      - /dev/dri:/dev/dri #Required for plex HW transcoding / QuickSync
+      - /dev/dri:/dev/dri
     volumes:
       - ${BASE_PATH}/qbittorrent/config:/config
       - ${MEDIA_SHARE}:/data
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 
-  #Tautulli - for plex statistics
   tautulli:
     image: lscr.io/linuxserver/tautulli:latest
     container_name: tautulli
@@ -249,7 +235,6 @@ services:
       - 8181:8181
     restart: unless-stopped
 
-  #Wizarr - invite links for your media server
   wizarr:
     container_name: wizarr
     image: ghcr.io/wizarrrr/wizarr:latest

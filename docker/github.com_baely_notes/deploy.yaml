@@ -1,5 +1,4 @@
 # Repo: https://github.com/baely/notes
-# Notes — encrypted notes (notes.baileys.app)
 name: notes
 
 services:
@@ -19,11 +18,11 @@ services:
       - baileys.public.title=Notes
       - baileys.public.description=Encrypted notes
     networks:
-      - web # previously on the default bridge; web keeps traefik routing
+      - web
 
 volumes:
   notes-data:
-    external: true # pre-existing volume from the original docker run deployment
+    external: true
 
 networks:
   web:

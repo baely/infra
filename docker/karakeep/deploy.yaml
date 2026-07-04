@@ -1,5 +1,3 @@
-# Karakeep bookmarks (karakeep.baileys.dev)
-# .env provides NEXTAUTH_SECRET, MEILI_MASTER_KEY, NEXTAUTH_URL.
 name: karakeep
 
 services:
@@ -19,7 +17,7 @@ services:
     environment:
       MEILI_ADDR: http://meilisearch:7700
       BROWSER_WEB_URL: http://chrome:9222
-      DATA_DIR: /data # DON'T CHANGE THIS
+      DATA_DIR: /data
 
   chrome:
     image: gcr.io/zenika-hub/alpine-chrome:124

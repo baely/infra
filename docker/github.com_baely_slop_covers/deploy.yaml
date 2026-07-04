@@ -1,6 +1,4 @@
 # Repo: https://github.com/baely/slop (covers/)
-# Covers — restaurants I've been to (covers.baileys.dev)
-# .env provides APP_PASSWORD and TRACK_TOKEN.
 name: covers
 
 services:
@@ -17,7 +15,6 @@ services:
       - "traefik.http.routers.covers.rule=Host(`covers.baileys.dev`)"
       - "traefik.http.services.covers.loadbalancer.server.port=8080"
       - "traefik.docker.network=web"
-      # show on the index site (index.baileys.app)
       - "baileys.public.title=Covers"
       - "baileys.public.description=Restaurants I've been to"
       - "baileys.public.url=https://covers.baileys.dev"

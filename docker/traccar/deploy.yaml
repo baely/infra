@@ -1,4 +1,3 @@
-# Traccar GPS tracking (track.baileys.dev / traccar.baileys.dev)
 name: traccar
 
 services:
@@ -7,8 +6,6 @@ services:
     container_name: traccar
     restart: unless-stopped
     volumes:
-      # traccar.xml contains database credentials, so it stays on the server (not committed here).
-      # Its database.url must point at jdbc:postgresql://pg_transactions:5432/db (via the pg network).
       - /opt/traccar/traccar.xml:/opt/traccar/conf/traccar.xml
       - /opt/traccar/logs:/opt/traccar/logs
       - traccardb:/opt/traccar/data
@@ -29,10 +26,10 @@ services:
 
 volumes:
   traccardb:
-    external: true # pre-existing volume from the original docker run deployment
+    external: true
 
 networks:
   web:
     external: true
   pg:
-    external: true # created by the pg_transactions stack
+    external: true

@@ -1,10 +1,8 @@
-# Ryot media tracker (tracker.baileys.dev)
-# .env provides POSTGRES_PASSWORD and SERVER_ADMIN_ACCESS_TOKEN.
 name: ryot
 
 services:
   ryot-db:
-    image: postgres:18-alpine # at-least version 15 is required
+    image: postgres:18-alpine
     restart: unless-stopped
     container_name: ryot-db
     volumes:

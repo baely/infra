@@ -1,4 +1,3 @@
-# Inbucket disposable email (SMTP on :25, web UI on :8124)
 name: inbucket
 
 services:
@@ -7,9 +6,8 @@ services:
     restart: always
     ports:
       - "25:2500"
-      - "8124:9000" # Web interface
+      - "8124:9000"
     volumes:
-      # config/storage predate this repo layout and stay in place
       - /home/user/inbucket/config:/config
       - /home/user/inbucket/storage:/storage
     environment:
