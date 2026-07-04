@@ -36,7 +36,7 @@ services:
     networks:
       - temporal-network
     volumes:
-      - ./scripts:/scripts
+      - /home/user/github/infra/docker/temporal/scripts:/scripts
     entrypoint: ["/bin/sh"]
     command: /scripts/setup-postgres.sh
 
@@ -58,7 +58,7 @@ services:
     networks:
       - temporal-network
     volumes:
-      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+      - /home/user/github/infra/docker/temporal/dynamicconfig:/etc/temporal/config/dynamicconfig
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "7233"]
       interval: 5s
@@ -79,7 +79,7 @@ services:
     networks:
       - temporal-network
     volumes:
-      - ./scripts:/scripts
+      - /home/user/github/infra/docker/temporal/scripts:/scripts
     entrypoint: ["/bin/sh"]
     command: /scripts/create-namespace.sh
 
