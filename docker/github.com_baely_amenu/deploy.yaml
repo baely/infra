@@ -19,12 +19,12 @@ services:
       - baileys.public.title=Menu
       - baileys.public.description=Upcoming menu for the week
     networks:
-      - menu-net
+      - web
 
 volumes:
   amenu-data:
     external: true
 
 networks:
-  menu-net:
+  web:
     external: true

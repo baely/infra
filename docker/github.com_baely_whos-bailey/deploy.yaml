@@ -5,6 +5,8 @@ services:
   whos-bailey:
     image: registry.baileys.dev/ai:latest
     restart: unless-stopped
+    networks:
+      - web
     labels:
       - traefik.enable=true
       - traefik.http.routers.ai.rule=Host(`ai.baileys.app`)
@@ -22,3 +24,7 @@ secrets:
     file: /home/user/secrets/up_token
   officetracker_token:
     file: /home/user/secrets/officetracker_token
+
+networks:
+  web:
+    external: true

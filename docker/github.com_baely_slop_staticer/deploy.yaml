@@ -28,11 +28,12 @@ services:
       - "traefik.http.routers.staticer-fallback.priority=1"
       - "traefik.http.routers.staticer-fallback.service=staticer"
     networks:
-      - staticer-network
+      - web
 
 volumes:
   staticer-data:
   staticer-sites:
 
 networks:
-  staticer-network:
+  web:
+    external: true

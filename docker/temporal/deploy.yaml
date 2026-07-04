@@ -95,14 +95,18 @@ services:
     image: temporalio/ui:2.34.0
     networks:
       - temporal-network
+      - web
     labels:
       - traefik.enable=true
       - traefik.http.routers.temporal.rule=Host(`temporal.baileys.dev`)
       - traefik.http.services.temporal.loadbalancer.server.port=8080
       - baileys.public.url=https://temporal.baileys.dev
       - baileys.public.title=Temporal
+      - traefik.docker.network=web
 
 networks:
   temporal-network:
     driver: bridge
     name: temporal-network
+  web:
+    external: true

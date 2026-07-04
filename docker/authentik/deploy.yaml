@@ -4,6 +4,8 @@ networks:
   default:
     external: false
     name: authentik
+  web:
+    external: true
 
 services:
   postgresql:
@@ -63,6 +65,10 @@ services:
       - traefik.enable=true
       - traefik.http.routers.authentik.rule=Host(`auth.baileys.app`)
       - traefik.http.services.authentik.loadbalancer.server.port=9000
+      - traefik.docker.network=web
+    networks:
+      - default
+      - web
   proxy:
     restart: unless-stopped
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/proxy}:${AUTHENTIK_TAG:-2025.2.1}
@@ -78,8 +84,10 @@ services:
       - traefik.http.services.proxy-service.loadbalancer.healthcheck.path=/outpost.goauthentik.io/ping
       - traefik.http.services.proxy-service.loadbalancer.healthcheck.port=9300
       - traefik.http.services.proxy-service.loadbalancer.server.port=9000
+      - traefik.docker.network=web
     networks:
       - default
+      - web
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.2.1}
     restart: unless-stopped
