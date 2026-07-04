@@ -67,7 +67,7 @@ services:
       start_period: 5m
     command: >-
       postgres
-      -c shared_preload_libraries=vectors.so
+      -c shared_preload_libraries=vchord.so,vectors.so
       -c 'search_path="$$user", public, vectors'
       -c logging_collector=on
       -c max_wal_size=2GB
