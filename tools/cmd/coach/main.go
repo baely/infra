@@ -53,6 +53,17 @@ type coachService struct {
 	squadv1alpha1.UnimplementedCoachServiceServer
 }
 
+// githubClient returns an authenticated client when GITHUB_TOKEN is set;
+// anonymous requests are limited to 60/hour per IP, which an all-services
+// deploy blows through.
+func githubClient() *github.Client {
+	client := github.NewClient(nil)
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		client = client.WithAuthToken(token)
+	}
+	return client
+}
+
 func (s *coachService) Assemble(ctx context.Context, req *squadv1alpha1.AssembleRequest) (*squadv1alpha1.AssembleResponse, error) {
 	if err := validateAssembleRequest(req); err != nil {
 		return nil, err
@@ -192,7 +203,7 @@ func (s *coachService) stopService(ctx context.Context, req *squadv1alpha1.Start
 }
 
 func getParentSHA(ctx context.Context, ref string) (string, error) {
-	client := github.NewClient(nil)
+	client := githubClient()
 	commit, _, err := client.Repositories.GetCommit(ctx, "baely", "infra", ref, nil)
 	if err != nil {
 		return "", err
@@ -237,7 +248,7 @@ func (s *coachService) runDockerCompose(workDir string, args ...string) error {
 
 func (s *coachService) downloadServiceConfig(ctx context.Context, serviceName, ref string) (string, error) {
 	log.Printf("Downloading service config for %s at ref %s", serviceName, ref)
-	client := github.NewClient(nil)
+	client := githubClient()
 
 	servicePath := path.Join("docker", serviceName)
 	log.Printf("Fetching contents from GitHub path: %s", servicePath)
