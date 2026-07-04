@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      services:
+        description: 'Comma-separated service dirs to deploy, or "all"'
+        required: false
+        default: all
 
 jobs:
   detect-services:
@@ -18,16 +24,28 @@ jobs:
       - name: Get changed docker services
         id: changes
         run: |
-          # Get list of changed files in docker/ directory
-          changed_files=$(git diff --name-only HEAD~1 HEAD | grep "^docker/" || true)
-          
-          if [ -z "$changed_files" ]; then
-            echo "services=[]" >> $GITHUB_OUTPUT
-            exit 0
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            input="${{ github.event.inputs.services }}"
+            if [ -z "$input" ] || [ "$input" = "all" ]; then
+              # Every service dir with a deploy.yaml, except coach itself
+              services=$(for d in docker/*/; do
+                [ -f "$d/deploy.yaml" ] && basename "$d"
+              done | grep -v "^github.com_baely_infra$")
+            else
+              services=$(echo "$input" | tr ',' '\n' | sed 's/^ *//; s/ *$//')
+            fi
+          else
+            # Get list of changed files in docker/ directory
+            changed_files=$(git diff --name-only HEAD~1 HEAD | grep "^docker/" || true)
+
+            if [ -z "$changed_files" ]; then
+              echo "services=[]" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+
+            # Extract service names from paths like docker/github.com_baely_service/
+            services=$(echo "$changed_files" | sed -n 's|^docker/\([^/]*\)/.*|\1|p' | sort -u)
           fi
-          
-          # Extract service names from paths like docker/github.com_baely_service/
-          services=$(echo "$changed_files" | sed -n 's|^docker/\([^/]*\)/.*|\1|p' | sort -u)
           
           # Convert to JSON array
           json_services=$(echo "$services" | jq -R -s -c 'split("\n") | map(select(length > 0))')
@@ -41,6 +59,7 @@ jobs:
     if: needs.detect-services.outputs.services != '[]'
     strategy:
       fail-fast: false
+      max-parallel: 6
       matrix:
         service: ${{ fromJson(needs.detect-services.outputs.services) }}
     steps:
