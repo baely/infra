@@ -1,0 +1,34 @@
+# Repo: https://github.com/baely/slop (voyage/)
+# Voyage trip planner (voyage.baileys.app)
+# .env provides ADMIN_TOKEN and UNSPLASH_ACCESS_KEY.
+name: traveller # keeps the pre-existing compose project (volume: traveller_voyage-data)
+
+services:
+  voyage:
+    image: registry.baileys.dev/voyage:latest
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      ADDR: ":8080"
+      DB_PATH: "/data/voyage.db"
+      TITLE: "Voyage"
+      CURRENCY: "AUD"
+      # Absolute base used to build share links.
+      BASE_URL: "https://voyage.baileys.app"
+      # TRUST_PROXY=1 because traefik terminates TLS and sets X-Forwarded-Proto.
+      TRUST_PROXY: "1"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.voyage.rule=Host(`voyage.baileys.app`)
+      - traefik.http.services.voyage.loadbalancer.server.port=8080
+    volumes:
+      - voyage-data:/data
+    networks:
+      - web
+
+volumes:
+  voyage-data:
+
+networks:
+  web:
+    external: true

@@ -1,0 +1,268 @@
+# Ultimate Plex Stack — media stack (Plex, Jellyfin, *arr, qBittorrent+VPN, ...)
+# Originally from https://github.com/DonMcD/ultimate-plex-stack
+# .env provides PUID/GUID/TZ/BASE_PATH/MEDIA_SHARE and the VPN credentials.
+# App config data lives under ${BASE_PATH}/<app>/config (bind mounts, outside the repo).
+# Note: prefetcharr was removed (it had been crashlooping and is no longer wanted).
+name: ultimate-plex-stack
+
+networks:
+  web:
+    external: true
+
+services:
+  #Plex - used to display the media
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${GUID}
+      - TZ=${TZ}
+      - VERSION=docker
+      - PLEX_CLAIM=${PLEX_CLAIM}
+    devices:
+      - /dev/dri:/dev/dri #Required for plex HW transcoding / QuickSync
+    volumes:
+      - ${BASE_PATH}/plex/config:/config
+      - ${MEDIA_SHARE}/media/tv:/tv
+      - ${MEDIA_SHARE}/media/movies:/movies
+    restart: unless-stopped
+
+  #Jellyfin - alternative media server to Plex
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.home.baileys.app`)"
+      - "traefik.http.routers.jellyfin.middlewares=internal-only@file"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+    environment:
+      - PUID=${PUID}
+      - PGID=${GUID}
+      - TZ=${TZ}
+    devices:
+      - /dev/dri:/dev/dri #Required for HW transcoding
+    volumes:
+      - ${BASE_PATH}/jellyfin/config:/config
+      - ${MEDIA_SHARE}/media/tv:/data/tvshows
+      - ${MEDIA_SHARE}/media/movies:/data/movies
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+
+  #Radarr - used to find movies automatically
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`radarr.home.baileys.app`)"
+      - "traefik.http.routers.radarr.middlewares=internal-only@file"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+    environment:
+      - PUID=${PUID}
+      - PGID=${GUID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/radarr/config:/config
+      - ${MEDIA_SHARE}:/data #Access to the entire share
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  #Sonarr - used to find tv shows automatically
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.rule=Host(`sonarr.home.baileys.app`)"
+      - "traefik.http.routers.sonarr.middlewares=internal-only@file"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+    environment:
+      - PUID=${PUID}
+      - PGID=${GUID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/sonarr/config:/config
+      - ${MEDIA_SHARE}:/data #Access to the entire share
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  #Prowlarr - manages your Sonarr, Radarr and download client
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.home.baileys.app`)"
+      - "traefik.http.routers.prowlarr.middlewares=internal-only@file"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+    environment:
+      - PUID=${PUID}
+      - PGID=${GUID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/prowlarr/config:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  #FlareSolverr - proxy server to bypass Cloudflare and DDoS-GUARD protection (used by Prowlarr)
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flaresolverr.rule=Host(`flaresolverr.home.baileys.app`)"
+      - "traefik.http.routers.flaresolverr.middlewares=internal-only@file"
+      - "traefik.http.services.flaresolverr.loadbalancer.server.port=8191"
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=${TZ}
+    ports:
+      - 8191:8191
+    restart: unless-stopped
+
+  #Autobrr - used to grab torrents using the trackers IRC channel
+  autobrr:
+    container_name: autobrr
+    image: ghcr.io/autobrr/autobrr:latest
+    restart: unless-stopped
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.autobrr.rule=Host(`autobrr.home.baileys.app`)"
+      - "traefik.http.routers.autobrr.middlewares=internal-only@file"
+      - "traefik.http.services.autobrr.loadbalancer.server.port=7474"
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${GUID}
+    volumes:
+      - ${BASE_PATH}/autobrr/config:/config
+    ports:
+      - 7474:7474
+
+  #Seerr - allows users to request media on their own
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.seerr.rule=Host(`request.baileys.app`)"
+      - "traefik.http.services.seerr.loadbalancer.server.port=5055"
+    environment:
+      - LOG_LEVEL=debug
+      - PUID=${PUID}
+      - PGID=${GUID}
+      - TZ=${TZ}
+      - PORT=5055 #optional
+    volumes:
+      - ${BASE_PATH}/seer/config:/app/config
+      - ${MEDIA_SHARE}:/data #Access to the entire share
+    restart: unless-stopped
+
+  qbit-vpn:
+    image: binhex/arch-qbittorrentvpn:latest
+    container_name: qbit-vpn
+    network_mode: bridge
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=0 # Required | Leave 0 because this container requires admin priviledges
+      - PGID=0 # Required | Leave 0 because this container requires admin priviledges
+      - UMASK=000 # Required
+      - TZ=${TZ} # Required
+      - WEBUI_PORT=8090 # Required, default 8080
+      - VPN_ENABLED=yes # Required | yes or no
+      - VPN_USER=${VPN_USER} # Optional if VPN_ENABLED=no
+      - VPN_PASS=${VPN_PASS} # Optional if VPN_ENABLED=no
+      - VPN_PROV=pia # Optional if VPN_ENABLED=no
+      - VPN_CLIENT=wireguard # Optional if VPN_ENABLED=no | Can be wireguard or openvpn
+      - STRICT_PORT_FORWARD=yes # Optional if VPN_ENABLED=no
+      - LAN_NETWORK=192.168.0.0/24 # Change this to your local network
+      - ENABLE_STARTUP_SCRIPTS=no # Optional | yes or no
+      - NAME_SERVERS=1.1.1.1,1.0.0.1
+      - ENABLE_PRIVOXY=yes
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1 # Required if using wireguard
+    privileged: true # Required if using wireguard
+    ports:
+      - 8090:8090 # WebUI
+      - 8118:8118 # Privoxy
+      - 58946:58946 # Torrenting (TCP)
+      - 58946:58946/udp # Torrenting (UDP)
+    devices:
+      - /dev/dri:/dev/dri #Required for plex HW transcoding / QuickSync
+    volumes:
+      - ${BASE_PATH}/qbittorrent/config:/config
+      - ${MEDIA_SHARE}:/data
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+
+  #Tautulli - for plex statistics
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tautulli.rule=Host(`tautulli.home.baileys.app`)"
+      - "traefik.http.routers.tautulli.middlewares=internal-only@file"
+      - "traefik.http.services.tautulli.loadbalancer.server.port=8181"
+    environment:
+      - PUID=${PUID}
+      - PGID=${GUID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/tautulli/config:/config
+    ports:
+      - 8181:8181
+    restart: unless-stopped
+
+  #Wizarr - invite links for your media server
+  wizarr:
+    container_name: wizarr
+    image: ghcr.io/wizarrrr/wizarr:latest
+    networks:
+      - default
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wizarr.rule=Host(`wizarr.home.baileys.app`)"
+      - "traefik.http.routers.wizarr.middlewares=internal-only@file"
+      - "traefik.http.services.wizarr.loadbalancer.server.port=5690"
+    ports:
+      - 5690:5690
+    volumes:
+      - ${BASE_PATH}/wizarr/data/database:/data/database
+    restart: unless-stopped

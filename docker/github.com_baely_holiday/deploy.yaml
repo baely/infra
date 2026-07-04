@@ -1,0 +1,48 @@
+# Repo: https://github.com/baely/holiday
+# Holidayer — holiday planner (holiday.baileys.app / holiday-api.baileys.app)
+# .env provides database credentials and Auth0 config.
+name: holidayer
+
+services:
+  db:
+    restart: unless-stopped
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-holidayer}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-holidayer}
+      POSTGRES_DB: ${POSTGRES_DB:-holidayer}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-holidayer}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    restart: unless-stopped
+    image: registry.baileys.dev/holidayer/api:${TAG:-latest}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    volumes:
+      - uploads:/data/uploads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.holidayer-api.rule=Host(`holiday-api.baileys.app`)
+      - traefik.http.services.holidayer-api.loadbalancer.server.port=8080
+
+  frontend:
+    restart: unless-stopped
+    image: registry.baileys.dev/holidayer/frontend:${TAG:-latest}
+    depends_on:
+      - api
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.holidayer.rule=Host(`holiday.baileys.app`)
+      - traefil.http.services.holidayer.loadbalancer.server.port=80 # "traefil" (sic) — matches the running label
+
+volumes:
+  pgdata:
+  uploads:

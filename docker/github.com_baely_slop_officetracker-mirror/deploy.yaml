@@ -1,0 +1,24 @@
+# Repo: https://github.com/baely/slop (officetracker-mirror/)
+# Read-only mirror of officetracker.com.au (officetracker.baileys.app)
+# .env provides OFFICETRACKER_TOKEN.
+name: officetracker-mirror
+
+services:
+  officetracker:
+    image: registry.baileys.dev/officetracker-mirror:latest
+    container_name: officetracker
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      ADDR: ":8080"
+      UPSTREAM: "https://officetracker.com.au"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.officetracker.rule=Host(`officetracker.baileys.app`)
+      - traefik.http.services.officetracker.loadbalancer.server.port=8080
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

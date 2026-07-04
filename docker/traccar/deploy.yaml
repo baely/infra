@@ -1,0 +1,34 @@
+# Traccar GPS tracking (track.baileys.dev / traccar.baileys.dev)
+name: traccar
+
+services:
+  traccar:
+    image: traccar/traccar:latest
+    container_name: traccar
+    restart: unless-stopped
+    volumes:
+      # traccar.xml contains database credentials, so it stays on the server (not committed here)
+      - /opt/traccar/traccar.xml:/opt/traccar/conf/traccar.xml
+      - /opt/traccar/logs:/opt/traccar/logs
+      - traccardb:/opt/traccar/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traccar-web.rule=Host(`track.baileys.dev`)
+      - traefik.http.routers.traccar-web.service=traccar-web
+      - traefik.http.services.traccar-web.loadbalancer.server.port=8082
+      - traefik.http.routers.traccar.rule=Host(`traccar.baileys.dev`)
+      - traefik.http.routers.traccar.service=traccar
+      - traefik.http.services.traccar.loadbalancer.server.port=5055
+      - baileys.public.url=https://track.baileys.dev
+      - baileys.public.title=Traccar
+      - baileys.public.description=Device tracking
+    networks:
+      - web
+
+volumes:
+  traccardb:
+    external: true # pre-existing volume from the original docker run deployment
+
+networks:
+  web:
+    external: true

@@ -1,6 +1,6 @@
 services:
   eink:
-    image: registry.baileys.dev/eink:v10
+    image: registry.baileys.dev/eink:v13
     restart: unless-stopped
     labels:
       - traefik.enable=true

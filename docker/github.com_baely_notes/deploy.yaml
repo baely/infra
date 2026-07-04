@@ -1,0 +1,30 @@
+# Repo: https://github.com/baely/notes
+# Notes — encrypted notes (notes.baileys.app)
+name: notes
+
+services:
+  notes:
+    image: registry.baileys.dev/notes:latest
+    container_name: notes
+    restart: unless-stopped
+    environment:
+      DB_PATH: /data/safe-notes.db
+    volumes:
+      - notes-data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.notes.rule=Host(`notes.baileys.app`)
+      - traefik.http.services.notes.loadbalancer.server.port=8080
+      - baileys.public.url=https://notes.baileys.app
+      - baileys.public.title=Notes
+      - baileys.public.description=Encrypted notes
+    networks:
+      - web # previously on the default bridge; web keeps traefik routing
+
+volumes:
+  notes-data:
+    external: true # pre-existing volume from the original docker run deployment
+
+networks:
+  web:
+    external: true

@@ -1,0 +1,31 @@
+# Webtop jumpbox (jump.baileys.dev)
+# .env provides PASSWORD (webtop login for CUSTOM_USER).
+name: jumpbox
+
+services:
+  jumpbox:
+    image: lscr.io/linuxserver/webtop:ubuntu-xfce
+    container_name: jumpbox
+    restart: "no" # matches how it currently runs; bump to unless-stopped if it should survive reboots
+    env_file: ".env"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: Australia/Sydney
+      CUSTOM_USER: bailey
+    volumes:
+      - webtop:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jump.rule=Host(`jump.baileys.dev`)
+      - traefik.http.services.jump.loadbalancer.server.port=3000
+    networks:
+      - web
+
+volumes:
+  webtop:
+    external: true # pre-existing volume from the original docker run deployment
+
+networks:
+  web:
+    external: true

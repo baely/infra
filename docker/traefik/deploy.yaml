@@ -1,0 +1,103 @@
+# Traefik reverse proxy (container: traefik-2)
+# Config (traefik.yml, conf.yaml) is committed here and mounted in.
+# Secrets: .env provides CF_API_KEY / CF_API_EMAIL for the Cloudflare DNS challenge.
+#
+# Traefik must be attached to every network it routes into. The networks below
+# are created by the other service stacks, so bring those up before (re)deploying
+# traefik, or pre-create any that are missing.
+name: traefik
+
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik-2
+    restart: unless-stopped
+    env_file: ".env"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2022:22" # ssh entrypoint (butsh)
+      - "8080:8080" # dashboard / api
+      - "8082:8082" # prometheus metrics
+    volumes:
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./conf.yaml:/etc/traefik/conf.yaml:ro
+      - acme:/acme
+      - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+      - host.docker.internal:172.17.0.1
+    labels:
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+    networks:
+      - bridge
+      - web
+      - authentik
+      - chatwoot_default
+      - holidayer_default
+      - immich_default
+      - karakeep_default
+      - menu-net
+      - prometheus_monitoring
+      - ryot_default
+      - staticer_staticer-network
+      - temporal-network
+      - ultimate-plex-stack_default
+      - viewing-schedule_default
+      - githubcom_baely_blog_default
+      - githubcom_baely_eink_default
+      - githubcom_baely_infra_default
+      - githubcom_baely_ip_default
+      - githubcom_baely_sh_default
+      - githubcom_baely_txn_default
+      - githubcom_baely_whos-bailey_default
+      - githubcom_devhou-se_accommodation_tracker_default
+
+volumes:
+  acme:
+    external: true # holds acme.json (Let's Encrypt certs), created by the original deployment
+
+networks:
+  bridge:
+    external: true # default docker bridge; legacy services still live here
+  web:
+    external: true
+  authentik:
+    external: true
+  chatwoot_default:
+    external: true
+  holidayer_default:
+    external: true
+  immich_default:
+    external: true
+  karakeep_default:
+    external: true
+  menu-net:
+    external: true
+  prometheus_monitoring:
+    external: true
+  ryot_default:
+    external: true
+  staticer_staticer-network:
+    external: true
+  temporal-network:
+    external: true
+  ultimate-plex-stack_default:
+    external: true
+  viewing-schedule_default:
+    external: true
+  githubcom_baely_blog_default:
+    external: true
+  githubcom_baely_eink_default:
+    external: true
+  githubcom_baely_infra_default:
+    external: true
+  githubcom_baely_ip_default:
+    external: true
+  githubcom_baely_sh_default:
+    external: true
+  githubcom_baely_txn_default:
+    external: true
+  githubcom_baely_whos-bailey_default:
+    external: true
+  githubcom_devhou-se_accommodation_tracker_default:
+    external: true
