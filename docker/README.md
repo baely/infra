@@ -11,7 +11,11 @@ One directory per service. Each contains:
 
 - **Own services** (built to `registry.baileys.dev`): `github.com_<org>_<repo>`, with
   `github.com_baely_slop_<app>` for apps living in the [slop](https://github.com/baely/slop) monorepo.
-- **Community services**: plain names (`authentik`, `pihole`, `traefik`, ...).
+- **Community services**: plain names (`authentik`, `immich`, `karakeep`, ...).
+
+**Core services are intentionally NOT managed here**: traefik, portainer, pihole and the
+docker registry are the bootstrap layer (ingress, management, DNS, image distribution) —
+a bad repo deploy shouldn't be able to take them down. They're managed directly on the server.
 
 ## Conventions
 
@@ -22,6 +26,8 @@ One directory per service. Each contains:
 - Data directories stay where they are (absolute paths, e.g. `/home/user/immich/library`);
   non-secret config files are committed next to the deploy.yaml and bind-mounted relatively.
 - Standalone traefik-routed services join the external `web` network.
+- The shared Postgres (`pg_transactions`) publishes no host port; consumers (traccar, txn)
+  reach it as `pg_transactions:5432` over the `pg` network it creates.
 
 ## Deploying
 

@@ -7,7 +7,8 @@ services:
     container_name: traccar
     restart: unless-stopped
     volumes:
-      # traccar.xml contains database credentials, so it stays on the server (not committed here)
+      # traccar.xml contains database credentials, so it stays on the server (not committed here).
+      # Its database.url must point at jdbc:postgresql://pg_transactions:5432/db (via the pg network).
       - /opt/traccar/traccar.xml:/opt/traccar/conf/traccar.xml
       - /opt/traccar/logs:/opt/traccar/logs
       - traccardb:/opt/traccar/data
@@ -24,6 +25,7 @@ services:
       - baileys.public.description=Device tracking
     networks:
       - web
+      - pg
 
 volumes:
   traccardb:
@@ -32,3 +34,5 @@ volumes:
 networks:
   web:
     external: true
+  pg:
+    external: true # created by the pg_transactions stack

@@ -1,4 +1,5 @@
-# Shared Postgres instance (host port 5432); used by traccar and others.
+# Shared Postgres instance, reachable only on the "pg" docker network
+# (pg_transactions:5432). Consumers: traccar, txn.
 # .env provides POSTGRES_USER / POSTGRES_PASSWORD.
 name: pg_transactions
 
@@ -10,11 +11,16 @@ services:
     env_file: ".env"
     environment:
       POSTGRES_DB: db
-    ports:
-      - "5432:5432"
     volumes:
       - pgtransactions:/var/lib/postgresql/data
+    networks:
+      - pg
 
 volumes:
   pgtransactions:
     external: true # pre-existing volume from the original docker run deployment
+
+networks:
+  pg:
+    name: pg
+    attachable: true # allows ad-hoc `docker network connect pg <container>`
