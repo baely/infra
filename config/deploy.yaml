@@ -2,6 +2,8 @@ services:
   coach:
     image: registry.baileys.dev/coach:latest
     restart: unless-stopped
+    networks:
+      - web
     labels:
       - traefik.enable=true
       - traefik.http.routers.coach.rule=Host(`coach.baileys.dev`)
@@ -11,3 +13,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/home/user/github/infra/docker:/app/services"
+
+networks:
+  web:
+    external: true

@@ -25,7 +25,9 @@ a bad repo deploy shouldn't be able to take them down. They're managed directly 
 - Volumes created by old `docker run` deployments are declared `external: true`.
 - Data directories stay where they are (absolute paths, e.g. `/home/user/immich/library`);
   non-secret config files are committed next to the deploy.yaml and bind-mounted relatively.
-- Standalone traefik-routed services join the external `web` network.
+- Every traefik-routed service joins the external `web` network (in addition to any
+  stack-internal networks) and pins `traefik.docker.network=web`. Traefik itself only
+  attaches to `web` (plus the default bridge for the hand-managed registry/portainer).
 - The shared Postgres (`pg_transactions`) publishes no host port; consumers (traccar, txn)
   reach it as `pg_transactions:5432` over the `pg` network it creates.
 

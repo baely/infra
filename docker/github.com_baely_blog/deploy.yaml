@@ -2,6 +2,8 @@ services:
   blog:
     image: registry.baileys.dev/blog:latest
     restart: unless-stopped
+    networks:
+      - web
     labels:
       - traefik.enable=true
       - traefik.http.routers.blog.rule=Host(`blog.baileys.dev`)
@@ -9,3 +11,7 @@ services:
       - baileys.public.url=https://blog.baileys.dev
       - baileys.public.title=Blog
       - baileys.public.description=Tech and other stuff
+
+networks:
+  web:
+    external: true

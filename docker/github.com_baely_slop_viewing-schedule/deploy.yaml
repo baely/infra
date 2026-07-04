@@ -20,6 +20,12 @@ services:
       - traefik.http.services.viewing.loadbalancer.server.port=8080
     volumes:
       - viewing-data:/data
+    networks:
+      - web
 
 volumes:
   viewing-data:
+
+networks:
+  web:
+    external: true

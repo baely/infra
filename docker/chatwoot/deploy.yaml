@@ -23,6 +23,10 @@ services:
       - traefik.enable=true
       - traefik.http.routers.chatwoot.rule=Host(`chat.baileys.app`)
       - traefik.http.services.chatwoot.loadbalancer.server.port=3000
+      - traefik.docker.network=web
+    networks:
+      - default
+      - web
 
   sidekiq:
     <<: *base
@@ -60,3 +64,7 @@ volumes:
   storage_data:
   postgres_data:
   redis_data:
+
+networks:
+  web:
+    external: true
