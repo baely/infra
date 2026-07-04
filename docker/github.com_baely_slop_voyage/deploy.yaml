@@ -1,0 +1,30 @@
+# Repo: https://github.com/baely/slop (voyage/)
+name: traveller
+
+services:
+  voyage:
+    image: registry.baileys.dev/voyage:latest
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      ADDR: ":8080"
+      DB_PATH: "/data/voyage.db"
+      TITLE: "Voyage"
+      CURRENCY: "AUD"
+      BASE_URL: "https://voyage.baileys.app"
+      TRUST_PROXY: "1"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.voyage.rule=Host(`voyage.baileys.app`)
+      - traefik.http.services.voyage.loadbalancer.server.port=8080
+    volumes:
+      - voyage-data:/data
+    networks:
+      - web
+
+volumes:
+  voyage-data:
+
+networks:
+  web:
+    external: true

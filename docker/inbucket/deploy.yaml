@@ -1,0 +1,16 @@
+name: inbucket
+
+services:
+  inbucket:
+    image: inbucket/inbucket
+    restart: always
+    ports:
+      - "25:2500"
+      - "8124:9000"
+    volumes:
+      - /home/user/inbucket/config:/config
+      - /home/user/inbucket/storage:/storage
+    environment:
+      - INBUCKET_SMTP_ACCEPTDOMAINS=yourdomain.com
+      - INBUCKET_STORAGE_TYPE=file
+      - INBUCKET_STORAGE_PARAMS_BASEDIR=/storage

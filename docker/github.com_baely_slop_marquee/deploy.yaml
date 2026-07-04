@@ -1,0 +1,33 @@
+# Repo: https://github.com/baely/slop (marquee/)
+name: marquee
+
+services:
+  marquee:
+    image: registry.baileys.dev/marquee:latest
+    container_name: marquee
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      TMDB_API_KEY: ""
+      RADARR_URL: "http://radarr:7878"
+      RADARR_QUALITY_PROFILE_ID: ""
+      RADARR_ROOT_FOLDER: ""
+      LETTERBOXD_USERNAME: "baely"
+      SYNC_INTERVAL_MIN: "60"
+      OWNER: "bailey"
+      DB_PATH: /data/marquee.db
+    volumes:
+      - marquee-data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.marquee.rule=Host(`marquee.home.baileys.app`)"
+      - "traefik.http.services.marquee.loadbalancer.server.port=8000"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+
+volumes:
+  marquee-data:

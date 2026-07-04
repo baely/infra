@@ -1,0 +1,24 @@
+# Repo: https://github.com/baely/slop (trackui/)
+name: location
+
+services:
+  location:
+    image: registry.baileys.dev/locationdashboard:latest
+    container_name: location
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      IBBITOT_URL: "https://isbaileybutlerintheoffice.today"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.location.rule=Host(`track.baileys.app`)
+      - traefik.http.services.location.loadbalancer.server.port=8080
+      - baileys.public.url=https://track.baileys.app
+      - baileys.public.title=Track
+      - baileys.public.description=Enriched location data
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

@@ -1,0 +1,23 @@
+name: home-assistant
+
+services:
+  home-assistant:
+    image: homeassistant/home-assistant:latest
+    container_name: home-assistant
+    restart: unless-stopped
+    volumes:
+      - homeassistant:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sleepywilliams.rule=Host(`home.baileys.app`)
+      - traefik.http.services.sleepywilliams.loadbalancer.server.port=8123
+    networks:
+      - web
+
+volumes:
+  homeassistant:
+    external: true
+
+networks:
+  web:
+    external: true

@@ -1,0 +1,23 @@
+name: pg_transactions
+
+services:
+  pg_transactions:
+    image: postgres:16
+    container_name: pg_transactions
+    restart: always
+    env_file: ".env"
+    environment:
+      POSTGRES_DB: db
+    volumes:
+      - pgtransactions:/var/lib/postgresql/data
+    networks:
+      - pg
+
+volumes:
+  pgtransactions:
+    external: true
+
+networks:
+  pg:
+    name: pg
+    attachable: true

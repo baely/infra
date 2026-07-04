@@ -1,0 +1,30 @@
+# Repo: https://github.com/baely/amenu
+name: menu
+
+services:
+  menu:
+    image: registry.baileys.dev/amenu:latest
+    container_name: menu
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      AMENU_DATA_FILE: /data/menu.json
+    volumes:
+      - amenu-data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.menu.rule=Host(`menu.baileys.app`)
+      - traefik.http.services.menu.loadbalancer.server.port=8080
+      - baileys.public.url=https://menu.baileys.app
+      - baileys.public.title=Menu
+      - baileys.public.description=Upcoming menu for the week
+    networks:
+      - menu-net
+
+volumes:
+  amenu-data:
+    external: true
+
+networks:
+  menu-net:
+    external: true

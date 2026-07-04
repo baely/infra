@@ -1,0 +1,25 @@
+# Repo: https://github.com/baely/slop (listing/)
+name: listing
+
+services:
+  listing:
+    image: registry.baileys.dev/listing:latest
+    container_name: listing-old
+    restart: unless-stopped
+    environment:
+      STATICER_URL: "https://lab.baileys.app"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.listing.rule=Host(`index.baileys.app`)
+      - traefik.http.services.listing.loadbalancer.server.port=8080
+      - baileys.public.url=https://index.baileys.app
+      - baileys.public.title=Service Index
+      - baileys.public.description=Directory of available services
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

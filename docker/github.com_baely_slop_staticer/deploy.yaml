@@ -1,0 +1,38 @@
+# Repo: https://github.com/baely/slop (staticer/)
+name: staticer
+
+services:
+  staticer:
+    image: registry.baileys.dev/staticer:latest
+    restart: unless-stopped
+    deploy:
+      replicas: 10
+    env_file: ".env"
+    environment:
+      SERVER_PORT: "8080"
+      SERVER_HOST: "lab.baileys.app"
+      SITES_DIR: /app/sites
+      DATABASE_PATH: /app/data/staticer.db
+      MAX_UPLOAD_SIZE: "1048576000"
+      MAX_EXTRACTED_SIZE: "5242880000"
+      MAX_FILES_PER_SITE: "10000"
+      RATE_LIMIT_UPLOADS: "10"
+    volumes:
+      - staticer-data:/app/data
+      - staticer-sites:/app/sites
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.staticer.rule=Host(`lab.baileys.app`) || HostRegexp(`{subdomain:[a-z]+-[a-z]+}.lab.baileys.app`) || HostRegexp(`^.+\\.lab\\.baileys\\.app$$`)"
+      - "traefik.http.services.staticer.loadbalancer.server.port=8080"
+      - "traefik.http.routers.staticer-fallback.rule=HostRegexp(`{catchall:.*}`) || HostRegexp(`^.+$$`)"
+      - "traefik.http.routers.staticer-fallback.priority=1"
+      - "traefik.http.routers.staticer-fallback.service=staticer"
+    networks:
+      - staticer-network
+
+volumes:
+  staticer-data:
+  staticer-sites:
+
+networks:
+  staticer-network:

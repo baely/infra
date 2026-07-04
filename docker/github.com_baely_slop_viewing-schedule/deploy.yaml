@@ -1,0 +1,25 @@
+# Repo: https://github.com/baely/slop (viewing-schedule/)
+name: viewing-schedule
+
+services:
+  viewing:
+    image: registry.baileys.dev/viewing-schedule:latest
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      ADDR: ":8080"
+      DB_PATH: "/data/viewing.db"
+      TITLE: "Viewing Schedule"
+      DATE_RANGE: ""
+      TRUST_PROXY: "1"
+      LETTERBOXD_USER: "baely"
+      SYNC_INTERVAL: "6h"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.viewing.rule=Host(`viewing.baileys.app`)
+      - traefik.http.services.viewing.loadbalancer.server.port=8080
+    volumes:
+      - viewing-data:/data
+
+volumes:
+  viewing-data:
