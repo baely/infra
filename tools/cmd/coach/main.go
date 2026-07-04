@@ -458,6 +458,11 @@ func copyMountedServiceFiles(sourcePath, destPath string) error {
 			return nil
 		}
 
+		if _, err := os.Stat(destFile); err == nil {
+			log.Printf("Skipping %s: file from GitHub at the requested ref takes precedence", relPath)
+			return nil
+		}
+
 		log.Printf("Copying file: %s -> %s (size: %d bytes)", path, destFile, info.Size())
 		data, err := os.ReadFile(path)
 		if err != nil {
