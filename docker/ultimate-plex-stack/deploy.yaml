@@ -44,8 +44,6 @@ services:
       - ${BASE_PATH}/jellyfin/config:/config
       - ${MEDIA_SHARE}/media/tv:/data/tvshows
       - ${MEDIA_SHARE}/media/movies:/data/movies
-    ports:
-      - 8096:8096
     restart: unless-stopped
 
   radarr:
@@ -66,8 +64,6 @@ services:
     volumes:
       - ${BASE_PATH}/radarr/config:/config
       - ${MEDIA_SHARE}:/data
-    ports:
-      - 7878:7878
     restart: unless-stopped
 
   sonarr:
@@ -88,8 +84,6 @@ services:
     volumes:
       - ${BASE_PATH}/sonarr/config:/config
       - ${MEDIA_SHARE}:/data
-    ports:
-      - 8989:8989
     restart: unless-stopped
 
   prowlarr:
@@ -109,8 +103,6 @@ services:
       - TZ=${TZ}
     volumes:
       - ${BASE_PATH}/prowlarr/config:/config
-    ports:
-      - 9696:9696
     restart: unless-stopped
 
   flaresolverr:
@@ -129,8 +121,6 @@ services:
       - LOG_HTML=false
       - CAPTCHA_SOLVER=none
       - TZ=${TZ}
-    ports:
-      - 8191:8191
     restart: unless-stopped
 
   autobrr:
@@ -151,8 +141,6 @@ services:
       - PGID=${GUID}
     volumes:
       - ${BASE_PATH}/autobrr/config:/config
-    ports:
-      - 7474:7474
 
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
@@ -231,8 +219,6 @@ services:
       - TZ=${TZ}
     volumes:
       - ${BASE_PATH}/tautulli/config:/config
-    ports:
-      - 8181:8181
     restart: unless-stopped
 
   wizarr:
@@ -246,8 +232,6 @@ services:
       - "traefik.http.routers.wizarr.rule=Host(`wizarr.home.baileys.app`)"
       - "traefik.http.routers.wizarr.middlewares=internal-only@file"
       - "traefik.http.services.wizarr.loadbalancer.server.port=5690"
-    ports:
-      - 5690:5690
     volumes:
       - ${BASE_PATH}/wizarr/data/database:/data/database
     restart: unless-stopped

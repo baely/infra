@@ -17,8 +17,6 @@ services:
       MAX_EXTRACTED_SIZE: "5242880000"
       MAX_FILES_PER_SITE: "10000"
       RATE_LIMIT_UPLOADS: "10"
-    ports:
-      - "8080"
     volumes:
       - staticer-data:/app/data
       - staticer-sites:/app/sites

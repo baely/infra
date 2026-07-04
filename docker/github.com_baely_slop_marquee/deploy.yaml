@@ -9,7 +9,7 @@ services:
     env_file: ".env"
     environment:
       TMDB_API_KEY: ""
-      RADARR_URL: "http://192.168.0.82:7878"
+      RADARR_URL: "http://radarr:7878"
       RADARR_QUALITY_PROFILE_ID: ""
       RADARR_ROOT_FOLDER: ""
       LETTERBOXD_USERNAME: "baely"
