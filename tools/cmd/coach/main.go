@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -108,6 +109,10 @@ func (s *coachService) Start(ctx context.Context, req *squadv1alpha1.StartReques
 	log.Printf("Downloading service config for %s", req.Service)
 	workDir, err := s.downloadServiceConfig(ctx, req.Service, req.Ref)
 	if err != nil {
+		if isNotFound(err) {
+			log.Printf("Service config for %s missing at %s; treating as a deletion", req.Service, req.Ref)
+			return s.stopService(ctx, req)
+		}
 		log.Printf("Failed to download service config: %v", err)
 		return nil, fmt.Errorf("failed to download service config: %w", err)
 	}
@@ -144,6 +149,71 @@ func (s *coachService) Start(ctx context.Context, req *squadv1alpha1.StartReques
 	log.Printf("Successfully started service: %s", req.Service)
 
 	return &squadv1alpha1.StartResponse{}, nil
+}
+
+// stopService tears down a service whose config directory was deleted at the
+// requested ref, using the config from the parent commit to drive
+// `docker compose down`. Volumes are always kept.
+func (s *coachService) stopService(ctx context.Context, req *squadv1alpha1.StartRequest) (*squadv1alpha1.StartResponse, error) {
+	parentSHA, err := getParentSHA(ctx, req.Ref)
+	if err != nil {
+		return nil, fmt.Errorf("service config not found at %s and parent commit could not be resolved: %w", req.Ref, err)
+	}
+
+	log.Printf("Fetching config for %s from parent commit %s to tear it down", req.Service, parentSHA)
+	workDir, err := s.downloadServiceConfig(ctx, req.Service, parentSHA)
+	if err != nil {
+		return nil, fmt.Errorf("service %s not found at %s or its parent %s: %w", req.Service, req.Ref, parentSHA, err)
+	}
+	defer func() {
+		if err := os.RemoveAll(workDir); err != nil {
+			log.Printf("Warning: failed to cleanup temp directory %s: %v", workDir, err)
+		}
+	}()
+
+	if err := validateDeployFile(workDir); err != nil {
+		return nil, err
+	}
+
+	log.Printf("Stopping service: %s", req.Service)
+	if err := s.runDockerCompose(workDir, "down"); err != nil {
+		// Project networks shared with other containers (e.g. traefik) cannot be
+		// removed; treat down as successful if no service containers remain.
+		remaining, psErr := s.dockerComposeOutput(workDir, "ps", "-aq")
+		if psErr != nil || remaining != "" {
+			log.Printf("Failed to stop service: %v", err)
+			return nil, fmt.Errorf("failed to stop service: %w", err)
+		}
+		log.Printf("Warning: compose down reported an error but no containers remain: %v", err)
+	}
+
+	log.Printf("Successfully stopped and removed service: %s", req.Service)
+	return &squadv1alpha1.StartResponse{}, nil
+}
+
+func getParentSHA(ctx context.Context, ref string) (string, error) {
+	client := github.NewClient(nil)
+	commit, _, err := client.Repositories.GetCommit(ctx, "baely", "infra", ref, nil)
+	if err != nil {
+		return "", err
+	}
+	if len(commit.Parents) == 0 {
+		return "", fmt.Errorf("commit %s has no parent", ref)
+	}
+	return commit.Parents[0].GetSHA(), nil
+}
+
+func isNotFound(err error) bool {
+	var ghErr *github.ErrorResponse
+	return errors.As(err, &ghErr) && ghErr.Response != nil && ghErr.Response.StatusCode == http.StatusNotFound
+}
+
+func (s *coachService) dockerComposeOutput(workDir string, args ...string) (string, error) {
+	fullArgs := append([]string{"compose", "-f", "deploy.yaml"}, args...)
+	cmd := exec.Command("docker", fullArgs...)
+	cmd.Dir = workDir
+	out, err := cmd.Output()
+	return strings.TrimSpace(string(out)), err
 }
 
 func (s *coachService) runDockerCompose(workDir string, args ...string) error {
