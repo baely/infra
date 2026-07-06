@@ -9,6 +9,7 @@ services:
     env_file: ".env"
     environment:
       AMENU_DATA_FILE: /data/menu.json
+      AMENU_ATTENDANCE_FILE: /data/attendance.json 
     volumes:
       - amenu-data:/data
     labels:
