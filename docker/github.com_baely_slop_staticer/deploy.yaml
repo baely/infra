@@ -27,6 +27,7 @@ services:
       - "traefik.http.routers.staticer-fallback.rule=HostRegexp(`{catchall:.*}`) || HostRegexp(`^.+$$`)"
       - "traefik.http.routers.staticer-fallback.priority=1"
       - "traefik.http.routers.staticer-fallback.service=staticer"
+      - "traefik.docker.network=web"
     networks:
       - web
 

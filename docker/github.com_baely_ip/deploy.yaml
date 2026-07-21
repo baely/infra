@@ -6,7 +6,7 @@ services:
       - web
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ip.rule=Host(`144.6.89.140`)
+      - traefik.http.routers.ip.rule=Host(`160.222.159.13`)
       - traefik.http.services.ip.loadbalancer.server.port=8080
 
 networks:

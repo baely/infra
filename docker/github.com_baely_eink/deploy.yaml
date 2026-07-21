@@ -1,6 +1,6 @@
 services:
   eink:
-    image: registry.baileys.dev/eink:v13
+    image: registry.baileys.dev/eink:v15
     restart: unless-stopped
     networks:
       - web
