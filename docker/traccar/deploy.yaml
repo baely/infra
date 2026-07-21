@@ -15,6 +15,10 @@ services:
       - traefik.http.routers.traccar-web.rule=Host(`traccar.int.xbd.au`)
       - traefik.http.routers.traccar-web.service=traccar-web
       - traefik.http.services.traccar-web.loadbalancer.server.port=8082
+      # trackui (location) has TRACK_BASE=https://track.baileys.dev/api hardcoded;
+      # keep the API path answering from traccar on the old host until slop is patched
+      - traefik.http.routers.traccar-api.rule=Host(`track.baileys.dev`) && PathPrefix(`/api`)
+      - traefik.http.routers.traccar-api.service=traccar-web
       - traefik.http.routers.traccar.rule=Host(`traccar.xbd.au`)
       - traefik.http.routers.traccar.service=traccar
       - traefik.http.services.traccar.loadbalancer.server.port=5055
