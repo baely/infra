@@ -99,6 +99,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.temporal.rule=Host(`temporal.int.xbd.au`)
+      - traefik.http.routers.temporal.middlewares=internal-only@file
       - traefik.http.services.temporal.loadbalancer.server.port=8080
       - baileys.public.url=https://temporal.int.xbd.au
       - baileys.public.title=Temporal

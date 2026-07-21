@@ -15,6 +15,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=web
       - traefik.http.routers.portainer.rule=Host(`portainer.int.xbd.au`)
+      - traefik.http.routers.portainer.middlewares=internal-only@file
       - traefik.http.services.portainer.loadbalancer.server.port=9000
     networks:
       - web
