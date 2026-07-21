@@ -5,20 +5,23 @@ services:
     image: lscr.io/linuxserver/webtop:ubuntu-xfce
     container_name: jumpbox
     restart: "no"
-    env_file: ".env"
     environment:
       PUID: "1000"
       PGID: "1000"
       TZ: Australia/Sydney
-      CUSTOM_USER: bailey
     volumes:
       - webtop:/config
     labels:
       - traefik.enable=true
       - traefik.http.routers.jump.rule=Host(`jump.baileys.dev`)
+      - traefik.http.routers.jump.middlewares=authentik-forward-auth@file
       - traefik.http.services.jump.loadbalancer.server.port=3000
+      - traefik.docker.network=web
     networks:
       - web
+      - pihole_dns
+    dns:
+      - 172.16.2.2
 
 volumes:
   webtop:
@@ -26,4 +29,6 @@ volumes:
 
 networks:
   web:
+    external: true
+  pihole_dns:
     external: true
