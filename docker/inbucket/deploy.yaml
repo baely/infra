@@ -5,8 +5,8 @@ services:
     image: inbucket/inbucket
     restart: always
     ports:
+      # SMTP ingest stays published; traefik has no :25 entrypoint
       - "25:2500"
-      - "8124:9000"
     volumes:
       - /home/user/inbucket/config:/config
       - /home/user/inbucket/storage:/storage
@@ -14,3 +14,15 @@ services:
       - INBUCKET_SMTP_ACCEPTDOMAINS=yourdomain.com
       - INBUCKET_STORAGE_TYPE=file
       - INBUCKET_STORAGE_PARAMS_BASEDIR=/storage
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.inbucket.rule=Host(`inbucket.int.xbd.au`)
+      - traefik.http.routers.inbucket.middlewares=internal-only@file
+      - traefik.http.services.inbucket.loadbalancer.server.port=9000
+      - traefik.docker.network=web
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
