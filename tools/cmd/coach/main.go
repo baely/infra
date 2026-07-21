@@ -117,6 +117,11 @@ func (s *coachService) Start(ctx context.Context, req *squadv1alpha1.StartReques
 	}
 	log.Printf("Start request validation passed")
 
+	if req.Service == "github.com_baely_infra" {
+		log.Printf("Skipping deployment for %s: coach cannot deploy itself; redeploy manually", req.Service)
+		return &squadv1alpha1.StartResponse{}, nil
+	}
+
 	log.Printf("Downloading service config for %s", req.Service)
 	workDir, err := s.downloadServiceConfig(ctx, req.Service, req.Ref)
 	if err != nil {
@@ -363,11 +368,7 @@ func validateStartRequest(req *squadv1alpha1.StartRequest) error {
 		log.Printf("Validation failed: ref is required")
 		return fmt.Errorf("ref is required")
 	}
-	if req.Service == "github.com_baely_infra" {
-		log.Printf("Validation failed: coach cannot deploy itself")
-		return fmt.Errorf("coach cannot deploy coach")
-	}
-	
+
 	log.Printf("Start request validation successful")
 	return nil
 }
