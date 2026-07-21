@@ -21,7 +21,7 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.chatwoot.rule=Host(`chat.baileys.dev`)
+      - traefik.http.routers.chatwoot.rule=Host(`chatwoot.xbd.au`)
       - traefik.http.services.chatwoot.loadbalancer.server.port=3000
       - traefik.docker.network=web
     networks:
