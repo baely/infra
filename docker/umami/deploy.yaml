@@ -21,7 +21,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=web
-      - traefik.http.routers.umami.rule=Host(`analytics.baileys.dev`)
+      - traefik.http.routers.umami.rule=Host(`umami.int.xbd.au`)
       - traefik.http.services.umami.loadbalancer.server.port=3000
     networks:
       - web

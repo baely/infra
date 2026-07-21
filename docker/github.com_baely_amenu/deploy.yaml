@@ -14,9 +14,9 @@ services:
       - amenu-data:/data
     labels:
       - traefik.enable=true
-      - traefik.http.routers.menu.rule=Host(`menu.baileys.app`)
+      - traefik.http.routers.menu.rule=Host(`menu.baileys.dev`)
       - traefik.http.services.menu.loadbalancer.server.port=8080
-      - baileys.public.url=https://menu.baileys.app
+      - baileys.public.url=https://menu.baileys.dev
       - baileys.public.title=Menu
       - baileys.public.description=Upcoming menu for the week
     networks:

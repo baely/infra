@@ -11,9 +11,9 @@ services:
       IBBITOT_URL: "https://isbaileybutlerintheoffice.today"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.location.rule=Host(`track.baileys.app`)
+      - traefik.http.routers.location.rule=Host(`track.baileys.dev`)
       - traefik.http.services.location.loadbalancer.server.port=8080
-      - baileys.public.url=https://track.baileys.app
+      - baileys.public.url=https://track.baileys.dev
       - baileys.public.title=Track
       - baileys.public.description=Enriched location data
     networks:

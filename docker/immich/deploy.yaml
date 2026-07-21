@@ -17,9 +17,9 @@ services:
       disable: false
     labels:
       - traefik.enable=true
-      - traefik.http.routers.immich.rule=Host(`photos.baileys.app`)
+      - traefik.http.routers.immich.rule=Host(`immich.xbd.au`)
       - traefik.http.services.immich.loadbalancer.server.port=2283
-      - baileys.public.url=https://photos.baileys.app
+      - baileys.public.url=https://immich.xbd.au
       - baileys.public.title=Immich
       - baileys.public.description=Photo backup
       - traefik.docker.network=web

@@ -13,7 +13,7 @@ services:
       - webtop:/config
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jump.rule=Host(`jump.baileys.dev`)
+      - traefik.http.routers.jump.rule=Host(`webtop.xbd.au`)
       - traefik.http.routers.jump.middlewares=authentik-forward-auth@file
       - traefik.http.services.jump.loadbalancer.server.port=3000
       - traefik.docker.network=web

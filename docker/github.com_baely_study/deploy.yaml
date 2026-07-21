@@ -20,10 +20,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=web
-      - traefik.http.routers.study.rule=Host(`study.baileys.app`)
+      - traefik.http.routers.study.rule=Host(`study.baileys.dev`)
       - traefik.http.services.study.loadbalancer.server.port=8080
     environment:
-      BASE_URL: https://study.baileys.app
+      BASE_URL: https://study.baileys.dev
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:?set in .env}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:?set in .env}
       # Only these GitHub logins may sign in (comma-separated). Fails closed.
