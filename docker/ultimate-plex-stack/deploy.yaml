@@ -196,7 +196,8 @@ services:
       - VPN_PROV=pia
       - VPN_CLIENT=wireguard
       - STRICT_PORT_FORWARD=yes
-      - LAN_NETWORK=192.168.0.0/24
+      # docker ranges included so traefik (bridge, 172.17.x) can reach the webui
+      - LAN_NETWORK=192.168.0.0/24,172.16.0.0/12
       - ENABLE_STARTUP_SCRIPTS=no
       - NAME_SERVERS=1.1.1.1,1.0.0.1
       - ENABLE_PRIVOXY=yes
