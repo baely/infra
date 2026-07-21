@@ -175,6 +175,13 @@ services:
     image: binhex/arch-qbittorrentvpn:latest
     container_name: qbit-vpn
     network_mode: bridge
+    labels:
+      # network_mode bridge can't join `web`; traefik is attached to bridge too
+      - "traefik.enable=true"
+      - "traefik.http.routers.qbit.rule=Host(`qbit.int.xbd.au`)"
+      - "traefik.http.routers.qbit.middlewares=internal-only@file"
+      - "traefik.http.services.qbit.loadbalancer.server.port=8090"
+      - "traefik.docker.network=bridge"
     cap_add:
       - NET_ADMIN
     environment:
@@ -197,10 +204,8 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     privileged: true
     ports:
-      - 8090:8090
+      # webui now behind traefik (qbit.int.xbd.au); peering rides the VPN tunnel
       - 8118:8118
-      - 58946:58946
-      - 58946:58946/udp
     devices:
       - /dev/dri:/dev/dri
     volumes:
