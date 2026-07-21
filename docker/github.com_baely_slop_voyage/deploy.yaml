@@ -11,11 +11,11 @@ services:
       DB_PATH: "/data/voyage.db"
       TITLE: "Voyage"
       CURRENCY: "AUD"
-      BASE_URL: "https://voyage.baileys.app"
+      BASE_URL: "https://voyage.baileys.dev"
       TRUST_PROXY: "1"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.voyage.rule=Host(`voyage.baileys.app`)
+      - traefik.http.routers.voyage.rule=Host(`voyage.baileys.dev`)
       - traefik.http.services.voyage.loadbalancer.server.port=8080
     volumes:
       - voyage-data:/data

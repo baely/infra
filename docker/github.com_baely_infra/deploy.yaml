@@ -9,7 +9,7 @@ services:
       - web
     labels:
       - traefik.enable=true
-      - traefik.http.routers.coach.rule=Host(`coach.baileys.dev`)
+      - traefik.http.routers.coach.rule=Host(`coach.xbd.au`)
       - traefik.http.services.coach.loadbalancer.server.scheme=h2c
       - traefik.http.services.coach.loadbalancer.server.port=8080
     env_file: ".env"

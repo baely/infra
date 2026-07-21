@@ -1,0 +1,29 @@
+name: portainer
+
+services:
+  portainer:
+    image: portainer/portainer-ce:sts
+    container_name: portainer
+    restart: always
+    ports:
+      - 8000:8000
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.portainer.rule=Host(`portainer.int.xbd.au`)
+      - traefik.http.routers.portainer.middlewares=internal-only@file
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+    networks:
+      - web
+
+volumes:
+  portainer_data:
+    external: true
+
+networks:
+  web:
+    external: true

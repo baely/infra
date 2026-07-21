@@ -8,15 +8,15 @@ services:
     restart: unless-stopped
     env_file: ".env"
     environment:
-      CHATWOOT_URL: "https://chat.baileys.app"
+      CHATWOOT_URL: "https://chat.baileys.dev"
       CHATWOOT_ACCOUNT_ID: "1"
       CHATWOOT_INBOX_ID: "1"
       PORT: "8080"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.hermes.rule=Host(`hermes.baileys.app`)
+      - traefik.http.routers.hermes.rule=Host(`hermes.baileys.app`) || Host(`hermes.baileys.dev`)
       - traefik.http.services.hermes.loadbalancer.server.port=8080
-      - baileys.public.url=https://hermes.baileys.app
+      - baileys.public.url=https://hermes.baileys.dev
       - baileys.public.title=Hermes
       - baileys.public.description=Message me
     networks:

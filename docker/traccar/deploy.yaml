@@ -12,13 +12,13 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=web
-      - traefik.http.routers.traccar-web.rule=Host(`track.baileys.dev`)
+      - traefik.http.routers.traccar-web.rule=Host(`traccar.int.xbd.au`)
       - traefik.http.routers.traccar-web.service=traccar-web
       - traefik.http.services.traccar-web.loadbalancer.server.port=8082
-      - traefik.http.routers.traccar.rule=Host(`traccar.baileys.dev`)
+      - traefik.http.routers.traccar.rule=Host(`traccar.xbd.au`)
       - traefik.http.routers.traccar.service=traccar
       - traefik.http.services.traccar.loadbalancer.server.port=5055
-      - baileys.public.url=https://track.baileys.dev
+      - baileys.public.url=https://traccar.int.xbd.au
       - baileys.public.title=Traccar
       - baileys.public.description=Device tracking
     networks:

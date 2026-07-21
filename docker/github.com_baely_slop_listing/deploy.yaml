@@ -7,14 +7,14 @@ services:
     container_name: listing-old
     restart: unless-stopped
     environment:
-      STATICER_URL: "https://lab.baileys.app"
+      STATICER_URL: "https://lab.baileys.dev"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
-      - traefik.http.routers.listing.rule=Host(`index.baileys.app`)
+      - traefik.http.routers.listing.rule=Host(`index.baileys.dev`)
       - traefik.http.services.listing.loadbalancer.server.port=8080
-      - baileys.public.url=https://index.baileys.app
+      - baileys.public.url=https://index.baileys.dev
       - baileys.public.title=Service Index
       - baileys.public.description=Directory of available services
     networks:

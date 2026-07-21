@@ -9,7 +9,7 @@ services:
       - homeassistant:/config
     labels:
       - traefik.enable=true
-      - traefik.http.routers.sleepywilliams.rule=Host(`home.baileys.app`)
+      - traefik.http.routers.sleepywilliams.rule=Host(`ha.xbd.au`)
       - traefik.http.services.sleepywilliams.loadbalancer.server.port=8123
     networks:
       - web

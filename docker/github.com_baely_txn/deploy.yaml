@@ -8,7 +8,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=web
-      - traefik.http.routers.txn.rule=Host(`caffeine-api.baileys.dev`) || Host(`caffeine.baileys.app`) || Host(`baileyneeds.coffee`) || Host(`isbaileybutlerintheoffice.today`) || Host(`events.baileys.dev`)
+      - traefik.http.routers.txn.rule=Host(`baileyneeds.coffee`) || Host(`isbaileybutlerintheoffice.today`) || Host(`events.baileys.dev`)
       - traefik.http.services.txn.loadbalancer.server.port=8080
       - baileys.public.url=https://baileyneeds.coffee
       - baileys.public.title=Caffeine Tracker

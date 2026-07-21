@@ -12,7 +12,7 @@ services:
       UPSTREAM: "https://officetracker.com.au"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.officetracker.rule=Host(`officetracker.baileys.app`)
+      - traefik.http.routers.officetracker.rule=Host(`officetracker.baileys.app`) || Host(`office.baileys.dev`)
       - traefik.http.services.officetracker.loadbalancer.server.port=8080
     networks:
       - web

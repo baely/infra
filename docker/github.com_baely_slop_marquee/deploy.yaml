@@ -20,7 +20,7 @@ services:
       - marquee-data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.marquee.rule=Host(`marquee.home.baileys.app`)"
+      - "traefik.http.routers.marquee.rule=Host(`marquee.int.xbd.au`)"
       - "traefik.http.services.marquee.loadbalancer.server.port=8000"
     networks:
       - web

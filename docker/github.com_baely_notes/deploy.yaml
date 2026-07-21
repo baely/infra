@@ -12,9 +12,9 @@ services:
       - notes-data:/data
     labels:
       - traefik.enable=true
-      - traefik.http.routers.notes.rule=Host(`notes.baileys.app`)
+      - traefik.http.routers.notes.rule=Host(`notes.baileys.dev`)
       - traefik.http.services.notes.loadbalancer.server.port=8080
-      - baileys.public.url=https://notes.baileys.app
+      - baileys.public.url=https://notes.baileys.dev
       - baileys.public.title=Notes
       - baileys.public.description=Encrypted notes
     networks:

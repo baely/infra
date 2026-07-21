@@ -10,7 +10,7 @@ services:
     env_file: ".env"
     environment:
       SERVER_PORT: "8080"
-      SERVER_HOST: "lab.baileys.app"
+      SERVER_HOST: "lab.baileys.dev"
       SITES_DIR: /app/sites
       DATABASE_PATH: /app/data/staticer.db
       MAX_UPLOAD_SIZE: "1048576000"
@@ -22,7 +22,7 @@ services:
       - staticer-sites:/app/sites
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.staticer.rule=Host(`lab.baileys.app`) || HostRegexp(`{subdomain:[a-z]+-[a-z]+}.lab.baileys.app`) || HostRegexp(`^.+\\.lab\\.baileys\\.app$$`)"
+      - "traefik.http.routers.staticer.rule=Host(`lab.baileys.dev`) || HostRegexp(`{subdomain:[a-z]+-[a-z]+}.lab.baileys.dev`) || HostRegexp(`^.+\\.lab\\.baileys\\.dev$$`)"
       - "traefik.http.services.staticer.loadbalancer.server.port=8080"
       - "traefik.http.routers.staticer-fallback.rule=HostRegexp(`{catchall:.*}`) || HostRegexp(`^.+$$`)"
       - "traefik.http.routers.staticer-fallback.priority=1"

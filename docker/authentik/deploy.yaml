@@ -63,7 +63,7 @@ services:
         condition: service_healthy
     labels:
       - traefik.enable=true
-      - traefik.http.routers.authentik.rule=Host(`auth.baileys.app`)
+      - traefik.http.routers.authentik.rule=Host(`auth.baileys.app`) || Host(`auth.xbd.au`)
       - traefik.http.services.authentik.loadbalancer.server.port=9000
       - traefik.docker.network=web
     networks:
