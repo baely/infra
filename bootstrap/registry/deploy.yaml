@@ -1,0 +1,34 @@
+# Bootstrap tier: hand-deployed ONLY (coach's images live here — the
+# pipeline can't rebuild its own registry). Captured from the hand-run
+# container.
+#
+# !! SECURITY: the registry-auth basicauth middleware below is DEFINED but
+# !! deliberately NOT attached to the router, faithfully matching the
+# !! running container — which means registry.baileys.dev is currently
+# !! OPEN to anonymous push/pull from the internet (supply-chain risk:
+# !! coach:latest is pulled from here). To close it, add:
+# !!   - traefik.http.routers.registry.middlewares=registry-auth
+# !! ...but FIRST configure docker login on the host daemon and in coach's
+# !! container, or every coach Assemble push will 401.
+name: registry
+
+services:
+  registry:
+    image: registry:latest
+    container_name: registry
+    restart: always
+    environment:
+      OTEL_TRACES_EXPORTER: none
+    volumes:
+      - /home/user/registry:/var/lib/registry
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.registry.rule=Host(`registry.baileys.dev`)
+      - traefik.http.middlewares.registry-auth.basicauth.users=${REGISTRY_HTPASSWD:?set in .env}
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

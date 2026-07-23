@@ -1,0 +1,40 @@
+# Bootstrap tier: hand-deployed ONLY (LAN DNS — a bad deploy takes name
+# resolution down for the whole network). Imported from the previously
+# hand-managed /home/user/pihole/docker-compose.yaml.
+# `name: pihole` pins the project so the network keeps its `pihole_dns`
+# name (jumpbox references it as external) and the volume is preserved.
+name: pihole
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8088:80/tcp"
+    environment:
+      TZ: 'Australia/Melbourne'
+      FTLCONF_webserver_api_password: ${PIHOLE_API_PASSWORD:?set in .env}
+      FTLCONF_dns_listeningMode: 'ALL'
+      # split-horizon: answer the public IP with the LAN address
+      FTLCONF_misc_dnsmasq_lines: 'alias=160.222.159.13,192.168.0.82,255.255.255.255'
+    volumes:
+      - pihole:/etc/pihole
+      - '/home/user/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
+    restart: unless-stopped
+    networks:
+      dns:
+        ipv4_address: 172.16.2.2
+
+volumes:
+  pihole:
+    external: true
+
+networks:
+  dns:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.2.0/24
+          gateway: 172.16.2.1
