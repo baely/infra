@@ -1,0 +1,34 @@
+name: pihole
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8088:80/tcp"
+    environment:
+      TZ: 'Australia/Melbourne'
+      FTLCONF_webserver_api_password: ${PIHOLE_API_PASSWORD:?set in .env}
+      FTLCONF_dns_listeningMode: 'ALL'
+      FTLCONF_misc_dnsmasq_lines: 'alias=160.222.159.13,192.168.0.82,255.255.255.255'
+    volumes:
+      - pihole:/etc/pihole
+      - '/home/user/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
+    restart: unless-stopped
+    networks:
+      dns:
+        ipv4_address: 172.16.2.2
+
+volumes:
+  pihole:
+    external: true
+
+networks:
+  dns:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.2.0/24
+          gateway: 172.16.2.1

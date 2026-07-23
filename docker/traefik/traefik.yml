@@ -1,0 +1,107 @@
+log:
+  level: DEBUG
+
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+entryPoints:
+  ssh:
+    address: :22
+
+  web:
+    address: :80
+    allowACMEByPass: false
+
+  websecure:
+    address: "[::]:443"
+    http:
+      middlewares:
+        - umami@file
+        - errors@file
+      tls:
+        certResolver: dev
+        domains:
+          - main: "baileys.dev"
+            sans:
+              - "*.baileys.dev"
+          - main: "baileys.app"
+            sans:
+              - "*.baileys.app"
+          - main: "home.baileys.app"
+            sans:
+              - "*.home.baileys.app"
+          - main: "lab.baileys.app"
+            sans:
+              - "*.lab.baileys.app"
+          - main: "lab.baileys.dev"
+            sans:
+              - "*.lab.baileys.dev"
+          - main: "isbaileybutlerintheoffice.today"
+          - main: "devhou.se"
+            sans:
+              - "*.devhou.se"
+          - main: "baileyneeds.coffee"
+          - main: "judd.devhou.se"
+            sans:
+              - "*.judd.devhou.se"
+          - main: "baileys.page"
+            sans:
+              - "*.baileys.page"
+          - main: "xbd.au"
+            sans:
+              - "*.xbd.au"
+          - main: "int.xbd.au"
+            sans:
+              - "*.int.xbd.au"
+          - main: "bailey.neso.au"
+
+api:
+  insecure: true
+  dashboard: true
+
+ping:
+  entryPoint: traefik
+
+providers:
+  docker:
+    defaultRule: Host(`{{ normalize .Name }}.docker`)
+    exposedByDefault: true
+  file:
+    filename: "/etc/traefik/conf.yaml"
+
+http:
+  services:
+    portainer:
+      server:
+        port: 9443
+
+certificatesResolvers:
+  dev:
+    acme:
+      email: "admin@baileys.dev"
+      storage: "/acme/acme.json"
+      dnsChallenge:
+        provider: cloudflare
+        delayBeforeCheck: 0
+  httpres:
+    acme:
+      email: "admin@baileys.dev"
+      storage: "/acme/httpres.json"
+      httpChallenge:
+        entryPoint: web
+  ipres:
+    acme:
+      email: "admin@baileys.dev"
+      storage: "/acme/ipres.json"
+      profile: shortlived
+      certificatesDuration: 160
+      disableCommonName: true
+      httpChallenge:
+        entryPoint: web
+
+experimental:
+  plugins:
+    umami-feeder:
+      moduleName: github.com/astappiev/traefik-umami-feeder
+      version: v1.4.1 # Replace with the latest version

@@ -1,0 +1,15 @@
+# Repo: https://github.com/baely/slop (errors/)
+services:
+  errors:
+    image: registry.baileys.dev/errors:latest
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.services.errors.loadbalancer.server.port=8080
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

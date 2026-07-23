@@ -6,7 +6,10 @@ services:
       - web
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ip.rule=Host(`160.222.159.13`)
+      - traefik.docker.network=web
+      - traefik.http.routers.ip.rule=Host(`160.222.159.13`) || HostRegexp(`^\[?2401:2520:243c:[0-9a-f:]+\]?$$`)
+      - traefik.http.routers.ip.tls=true
+      - traefik.http.routers.ip.tls.certresolver=ipres
       - traefik.http.services.ip.loadbalancer.server.port=8080
 
 networks:

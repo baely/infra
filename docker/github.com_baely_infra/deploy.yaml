@@ -16,6 +16,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/home/user/github/infra/docker:/app/services"
+      - "/home/user/.docker-coach:/root/.docker"
 
 networks:
   web:
