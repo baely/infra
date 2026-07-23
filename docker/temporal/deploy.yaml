@@ -42,7 +42,7 @@ services:
 
   temporal:
     restart: unless-stopped
-    image: temporalio/server:1.29.1
+    image: temporalio/server:1.31.2
     container_name: temporal
     depends_on:
       temporal-admin-tools:
