@@ -2,7 +2,7 @@ name: inbucket
 
 services:
   inbucket:
-    image: inbucket/inbucket
+    image: inbucket/inbucket:3.1.1
     restart: always
     ports:
       # SMTP ingest stays published; traefik has no :25 entrypoint
