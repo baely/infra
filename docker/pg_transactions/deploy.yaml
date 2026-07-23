@@ -2,7 +2,7 @@ name: pg_transactions
 
 services:
   pg_transactions:
-    image: postgres:16
+    image: postgres:18
     container_name: pg_transactions
     restart: always
     env_file: ".env"
