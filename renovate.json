@@ -6,13 +6,13 @@
   ],
   "timezone": "Australia/Melbourne",
   "docker-compose": {
-    "fileMatch": [
-      "^docker/[^/]+/deploy\\.yaml$"
+    "managerFilePatterns": [
+      "/^docker/[^/]+/deploy\\.yaml$/"
     ]
   },
   "packageRules": [
     {
-      "description": "Own images are pushed by coach as :latest \u2014 not Renovate's job",
+      "description": "Own images are pushed by coach as :latest — not Renovate's job",
       "matchDatasources": [
         "docker"
       ],
