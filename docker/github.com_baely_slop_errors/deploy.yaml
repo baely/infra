@@ -1,6 +1,4 @@
 # Repo: https://github.com/baely/slop (errors/)
-# Service-only (no router): referenced by the errors@file middleware in
-# bootstrap/traefik/conf.yaml to serve custom error pages.
 services:
   errors:
     image: registry.baileys.dev/errors:latest
