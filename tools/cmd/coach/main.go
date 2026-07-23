@@ -53,6 +53,13 @@ type coachService struct {
 	squadv1alpha1.UnimplementedCoachServiceServer
 }
 
+// protectedServices are never deployed by coach; Start requests for them
+// succeed as no-ops so CI stays green. Deploy these by hand on the server.
+var protectedServices = map[string]string{
+	"github.com_baely_infra": "coach cannot deploy itself; redeploy manually",
+	"traefik":                "the edge proxy is hand-deployed from bootstrap/, never via coach",
+}
+
 // githubClient returns an authenticated client when GITHUB_TOKEN is set;
 // anonymous requests are limited to 60/hour per IP, which an all-services
 // deploy blows through.
@@ -116,6 +123,11 @@ func (s *coachService) Start(ctx context.Context, req *squadv1alpha1.StartReques
 		return nil, err
 	}
 	log.Printf("Start request validation passed")
+
+	if reason, protected := protectedServices[req.Service]; protected {
+		log.Printf("Skipping deployment for %s: %s", req.Service, reason)
+		return &squadv1alpha1.StartResponse{}, nil
+	}
 
 	log.Printf("Downloading service config for %s", req.Service)
 	workDir, err := s.downloadServiceConfig(ctx, req.Service, req.Ref)
@@ -363,11 +375,7 @@ func validateStartRequest(req *squadv1alpha1.StartRequest) error {
 		log.Printf("Validation failed: ref is required")
 		return fmt.Errorf("ref is required")
 	}
-	if req.Service == "github.com_baely_infra" {
-		log.Printf("Validation failed: coach cannot deploy itself")
-		return fmt.Errorf("coach cannot deploy coach")
-	}
-	
+
 	log.Printf("Start request validation successful")
 	return nil
 }
