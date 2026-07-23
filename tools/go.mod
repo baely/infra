@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/google/go-github/v74 v74.0.0
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.2
 	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.11
 )
@@ -12,7 +12,7 @@ require (
 require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
