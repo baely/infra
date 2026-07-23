@@ -18,7 +18,7 @@ jobs:
       services: ${{ steps.changes.outputs.services }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
       - name: Get changed docker services
@@ -64,9 +64,9 @@ jobs:
         service: ${{ fromJson(needs.detect-services.outputs.services) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version-file: tools/go.mod
       - name: Deploy Service
