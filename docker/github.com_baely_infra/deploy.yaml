@@ -1,5 +1,5 @@
 # Repo: https://github.com/baely/infra
-# Ref: 2db3cc6ce4e6590b91c89918bf41bf353786b492
+# Ref: 92a43cd1b6ae99b4c698d1430c779b1ddb99f823
 
 services:
   coach:
@@ -9,7 +9,7 @@ services:
       - web
     labels:
       - traefik.enable=true
-      - traefik.http.routers.coach.rule=Host(`coach.xbd.au`)
+      - traefik.http.routers.coach.rule=Host(`coach.baileys.dev`)
       - traefik.http.services.coach.loadbalancer.server.scheme=h2c
       - traefik.http.services.coach.loadbalancer.server.port=8080
     env_file: ".env"
