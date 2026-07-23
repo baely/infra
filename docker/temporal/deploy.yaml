@@ -3,7 +3,7 @@ name: temporal
 services:
   postgresql:
     restart: unless-stopped
-    image: postgres:16
+    image: postgres:18
     container_name: temporal-postgresql
     environment:
       POSTGRES_PASSWORD: temporal
