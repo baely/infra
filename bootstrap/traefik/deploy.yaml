@@ -1,0 +1,39 @@
+# Bootstrap tier: hand-deployed ONLY, never via coach/CI — the edge cannot
+# safely deploy itself (a bad config would take down the path used to fix it).
+#
+# Deploy (brief full-edge outage):
+#   cd ~/github/infra/bootstrap/traefik
+#   docker rm -f traefik-2            # first adoption only
+#   docker compose -f deploy.yaml up -d
+#   docker network connect bridge traefik-2   # bridge-only backends: registry, qbit-vpn
+#
+# Static config (traefik.yml) is read at startup only — restart to apply.
+# conf.yaml (file provider) hot-reloads.
+name: traefik
+
+services:
+  traefik:
+    image: registry.baileys.dev/traefik:latest
+    container_name: traefik-2
+    restart: unless-stopped
+    env_file: ".env"
+    ports:
+      - 80:80
+      - 443:443
+      - 2022:22   # ssh entrypoint
+      - 8080:8080 # dashboard/api (insecure) — LAN-only via NAT
+      - 8082:8082 # vestigial (no entrypoint bound); kept for parity
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - acme:/acme
+      - /home/user/github/infra/bootstrap/traefik:/etc/traefik:ro
+    networks:
+      - web
+
+volumes:
+  acme:
+    external: true
+
+networks:
+  web:
+    external: true

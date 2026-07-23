@@ -1,0 +1,59 @@
+http:
+  middlewares:
+    authentik-forward-auth:
+      forwardAuth:
+        address: "http://authentik-proxy-1:9000/outpost.goauthentik.io/auth/traefik"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-authentik-username"
+          - "X-authentik-groups"
+          - "X-authentik-email"
+          - "X-authentik-name"
+          - "X-authentik-uid"
+          - "X-authentik-jwt"
+          - "X-authentik-meta-jwks"
+          - "X-authentik-meta-outpost"
+          - "X-authentik-meta-provider"
+          - "X-authentik-meta-app"
+          - "X-authentik-meta-version"
+    internal-only:
+      ipAllowList:
+        sourceRange:
+          - "10.0.0.0/8"
+          - "127.0.0.1/32"
+          - "172.16.0.0/12"
+          - "192.168.0.0/16"
+          - "2401:2520:243c::/48"
+    umami:
+      plugin:
+        umami-feeder:
+          umamiHost: "http://192.168.0.82:8300"   # internal service name, never leaves the network
+          # automatic mode: plugin fetches/creates website IDs itself
+          umamiUsername: "admin"
+          umamiPassword: '{{ env "UMAMI_PASSWORD" }}'
+          createNewWebsites: true
+    errors:
+      errors:
+        status:
+          - "400"
+          - "401"
+          - "403"
+          - "404"
+          - "429"
+          - "500"
+          - "502"
+          - "503"
+          - "504"
+        service: "errors@docker"
+#        service: "errors-githubcom-baely-slop-errors@docker"
+        query: "/{status}.html"
+
+tls:
+  stores:
+    default:
+      defaultGeneratedCert:
+        resolver: ipres
+        domain:
+          main: "2401:2520:243c::a0de:9f0d"
+          sans:
+            - "160.222.159.13"
