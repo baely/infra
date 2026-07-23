@@ -24,7 +24,7 @@ jobs:
       - stage
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup Go
         uses: actions/setup-go@v7
         with:

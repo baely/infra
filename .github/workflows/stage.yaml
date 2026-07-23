@@ -32,7 +32,7 @@ jobs:
           owner: baely
           repositories: infra,${{ inputs.repo }}
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: baely/infra
           ref: main
