@@ -13,6 +13,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=web
       - traefik.http.routers.registry.rule=Host(`registry.baileys.dev`)
+      - traefik.http.routers.registry.middlewares=registry-auth
       - traefik.http.middlewares.registry-auth.basicauth.users=${REGISTRY_HTPASSWD:?set in .env}
     networks:
       - web
