@@ -1,5 +1,5 @@
 # Repo: https://github.com/baely/infra
-# Ref: 92a43cd1b6ae99b4c698d1430c779b1ddb99f823
+# Ref: 248458298301952fb2a9fd434f14fcac3d2a8fcb
 
 services:
   coach:
@@ -16,7 +16,6 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/home/user/github/infra/docker:/app/services"
-      - "/home/user/.docker-coach:/root/.docker"
 
 networks:
   web:
