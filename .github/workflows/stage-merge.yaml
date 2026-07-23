@@ -19,7 +19,7 @@ jobs:
           app-id: ${{ secrets.APPROVER_APP_ID }}
           private-key: ${{ secrets.APPROVER_APP_SECRET }}
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Filter Config Changes
         uses: dorny/paths-filter@v3
         id: changes
