@@ -1,39 +1,54 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":dependencyDashboard"],
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard"
+  ],
   "timezone": "Australia/Melbourne",
   "docker-compose": {
-    "fileMatch": ["^docker/[^/]+/deploy\\.yaml$"]
+    "fileMatch": [
+      "^docker/[^/]+/deploy\\.yaml$"
+    ]
   },
   "packageRules": [
     {
-      "description": "Own images are pushed by coach as :latest — not Renovate's job",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["registry.baileys.dev/**"],
+      "description": "Own images are pushed by coach as :latest \u2014 not Renovate's job",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "registry.baileys.dev/**"
+      ],
       "enabled": false
     },
     {
       "description": "Group patch-level image bumps into one PR",
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["patch", "pin", "digest"],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "pin",
+        "digest"
+      ],
       "groupName": "docker patch updates"
     },
     {
       "description": "Majors wait for approval on the dependency dashboard",
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["major"],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "dependencyDashboardApproval": true
     },
     {
-      "matchPackageNames": ["chatwoot/chatwoot"],
+      "matchPackageNames": [
+        "chatwoot/chatwoot"
+      ],
       "prBodyNotes": [
-        "⚠️ chatwoot upgrades need a manual `bundle exec rails db:migrate` in the rails container after deploy"
-      ]
-    },
-    {
-      "matchPackageNames": ["ghcr.io/immich-app/**"],
-      "prBodyNotes": [
-        "⚠️ immich is version-pinned via IMMICH_VERSION in the server-side .env — bump that too, and check the release notes for breaking changes"
+        "\u26a0\ufe0f chatwoot upgrades need a manual `bundle exec rails db:migrate` in the rails container after deploy"
       ]
     }
   ]
