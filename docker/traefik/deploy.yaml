@@ -17,7 +17,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - acme:/acme
-      - /home/user/github/infra/bootstrap/traefik:/etc/traefik:ro
+      - /home/user/github/infra/docker/traefik:/etc/traefik:ro
     networks:
       - web
 
