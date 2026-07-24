@@ -33,7 +33,7 @@ jobs:
         with:
           github-token: ${{ steps.approver-app-token.outputs.token }}
       - name: Automerge
-        if: contains(fromJSON('["baileys-infra-manager[bot]", "renovate[bot]"]'), github.event.pull_request.user.login)
+        if: github.event.pull_request.user.login == 'baileys-infra-manager[bot]'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
