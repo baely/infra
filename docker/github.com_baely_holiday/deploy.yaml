@@ -4,7 +4,7 @@ name: holidayer
 services:
   db:
     restart: unless-stopped
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-holidayer}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-holidayer}

@@ -3,7 +3,7 @@ name: temporal
 services:
   postgresql:
     restart: unless-stopped
-    image: postgres:18
+    image: postgres:16
     container_name: temporal-postgresql
     environment:
       POSTGRES_PASSWORD: temporal
@@ -42,7 +42,7 @@ services:
 
   temporal:
     restart: unless-stopped
-    image: temporalio/server:1.31.2
+    image: temporalio/server:1.29.1
     container_name: temporal
     depends_on:
       temporal-admin-tools:
@@ -92,7 +92,7 @@ services:
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CORS_ORIGINS=http://localhost:3000
-    image: temporalio/ui:2.52.1
+    image: temporalio/ui:2.34.0
     networks:
       - temporal-network
       - web
