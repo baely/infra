@@ -1,0 +1,24 @@
+# Repo: https://github.com/baely/slop (movies/)
+# Ref: 19a0488
+name: movies
+
+services:
+  movies:
+    image: registry.baileys.dev/movies:latest
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      ADDR: ":8080"
+      RADARR_URL: "http://radarr:7878"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.movies.rule=Host(`movies.int.xbd.au`)
+      - traefik.http.routers.movies.middlewares=internal-only@file
+      - traefik.http.services.movies.loadbalancer.server.port=8080
+      - traefik.docker.network=web
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
