@@ -1,0 +1,73 @@
+# 301s for the hostnames decommissioned by the domain migration (#42).
+# Traefik still terminates TLS for the old zones (they remain in its cert
+# list); nginx maps each dead host to its new home, keeping path + query.
+#
+# Only ever list hosts with NO live router: this router's rule is long, and
+# traefik's length-based priority would steal traffic from any real service
+# sharing a host. That's why auth/hermes/officetracker.baileys.app (still
+# dual-homed), track.baileys.dev (reassigned to trackui) and coach.baileys.dev
+# (coachassistant + deploy CI still dial it) are absent.
+name: redirector
+
+configs:
+  redirector_conf:
+    content: |
+      map $$host $$new_host {
+          # baileys.app -> same name on baileys.dev
+          menu.baileys.app          menu.baileys.dev;
+          notes.baileys.app         notes.baileys.dev;
+          study.baileys.app         study.baileys.dev;
+          track.baileys.app         track.baileys.dev;
+          voyage.baileys.app        voyage.baileys.dev;
+          index.baileys.app         index.baileys.dev;
+          lab.baileys.app           lab.baileys.dev;
+
+          # baileys.app -> xbd.au
+          chat.baileys.app          chatwoot.xbd.au;
+          photos.baileys.app        immich.xbd.au;
+          request.baileys.app       seerr.xbd.au;
+          home.baileys.app          ha.xbd.au;
+
+          # caffeine tracker consolidated onto its gimmick domain
+          caffeine.baileys.app      baileyneeds.coffee;
+          caffeine-api.baileys.dev  baileyneeds.coffee;
+
+          # baileys.dev -> xbd.au
+          jump.baileys.dev          webtop.xbd.au;
+          traccar.baileys.dev       traccar.xbd.au;
+          temporal.baileys.dev      temporal.int.xbd.au;
+          analytics.baileys.dev     umami.int.xbd.au;
+          services.baileys.dev      services.int.xbd.au;
+
+          # media/internal tier and staticer lab sites keep their subdomain
+          ~^(?<sub>.+)\.home\.baileys\.app$  $${sub}.int.xbd.au;
+          ~^(?<sub>.+)\.lab\.baileys\.app$   $${sub}.lab.baileys.dev;
+
+          default                   index.baileys.dev;
+      }
+
+      server {
+          listen 8080 default_server;
+          server_name _;
+          return 301 https://$$new_host$$request_uri;
+      }
+
+services:
+  redirector:
+    image: nginx:1.29-alpine
+    container_name: redirector
+    restart: unless-stopped
+    configs:
+      - source: redirector_conf
+        target: /etc/nginx/conf.d/default.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.redirector.rule=Host(`menu.baileys.app`) || Host(`notes.baileys.app`) || Host(`study.baileys.app`) || Host(`track.baileys.app`) || Host(`voyage.baileys.app`) || Host(`index.baileys.app`) || Host(`chat.baileys.app`) || Host(`photos.baileys.app`) || Host(`request.baileys.app`) || Host(`home.baileys.app`) || Host(`lab.baileys.app`) || Host(`caffeine.baileys.app`) || Host(`caffeine-api.baileys.dev`) || Host(`jump.baileys.dev`) || Host(`traccar.baileys.dev`) || Host(`temporal.baileys.dev`) || Host(`analytics.baileys.dev`) || Host(`services.baileys.dev`) || HostRegexp(`^.+\\.home\\.baileys\\.app$$`) || HostRegexp(`^.+\\.lab\\.baileys\\.app$$`)"
+      - "traefik.http.services.redirector.loadbalancer.server.port=8080"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
