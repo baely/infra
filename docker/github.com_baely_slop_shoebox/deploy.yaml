@@ -6,7 +6,6 @@ services:
   shoebox:
     image: registry.baileys.dev/shoebox:latest
     restart: unless-stopped
-    env_file: ".env"
     environment:
       ADDR: ":8080"
       SMTP_ADDR: ":2525"
