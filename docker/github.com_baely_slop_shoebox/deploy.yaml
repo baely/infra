@@ -1,0 +1,35 @@
+# Repo: https://github.com/baely/slop (shoebox/)
+# Ref: 4e7bd79723dc8a292741b0cddd6208a978acd1e2
+name: shoebox
+
+services:
+  shoebox:
+    image: registry.baileys.dev/shoebox:latest
+    restart: unless-stopped
+    env_file: ".env"
+    environment:
+      ADDR: ":8080"
+      SMTP_ADDR: ":2525"
+      DATA_DIR: "/data"
+      SMTP_DOMAIN: "shoebox.baileys.dev"
+      INGEST_ADDR: "tax@baileys.dev"
+      TZ: "Australia/Melbourne"
+    ports:
+      # SMTP ingest for the (future) tax@ mail router; :25 belongs to inbucket.
+      - "2525:2525"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.shoebox.rule=Host(`shoebox.baileys.dev`)
+      - traefik.http.services.shoebox.loadbalancer.server.port=8080
+      - traefik.docker.network=web
+    volumes:
+      - shoebox-data:/data
+    networks:
+      - web
+
+volumes:
+  shoebox-data:
+
+networks:
+  web:
+    external: true
