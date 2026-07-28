@@ -14,22 +14,26 @@ services:
       SMTP_DOMAIN: "shoebox.baileys.dev"
       INGEST_ADDR: "tax@baileys.dev"
       TZ: "Australia/Melbourne"
-    ports:
-      # SMTP ingest for the (future) tax@ mail router; :25 belongs to inbucket.
-      - "2525:2525"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.shoebox.rule=Host(`shoebox.baileys.dev`)
+      - traefik.http.routers.shoebox.rule=Host(`shoebox.int.xbd.au`)
+      - traefik.http.routers.shoebox.middlewares=internal-only@file
       - traefik.http.services.shoebox.loadbalancer.server.port=8080
       - traefik.docker.network=web
     volumes:
       - shoebox-data:/data
     networks:
       - web
+      # SMTP ingest is only reachable from the mail router:
+      # transport line `tax@baileys.dev smtp:[shoebox]:2525`
+      - mailnet
 
 volumes:
   shoebox-data:
 
 networks:
   web:
+    external: true
+  mailnet:
+    name: postfix_mailnet
     external: true
