@@ -18,8 +18,11 @@ services:
       - traefik.http.services.jump.loadbalancer.server.port=3000
       - traefik.docker.network=web
     networks:
-      - web
-      - pihole_dns
+      web:
+      pihole_dns:
+        # pinned: dynamic IPAM starts at .2 and can steal pihole's static
+        # 172.16.2.2 in the boot-order race (took DNS down 2026-07-30)
+        ipv4_address: 172.16.2.3
     dns:
       - 172.16.2.2
 
