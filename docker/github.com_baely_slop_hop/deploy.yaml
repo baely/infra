@@ -1,0 +1,40 @@
+# Repo: https://github.com/baely/slop (hop/)
+# Ref: 0fada40454629d62bdc378741064354138ab9373
+#
+# Links live inline below and are mounted over the image's sample file at
+# /etc/hop/links.txt. Edit a line, merge, and coach redeploys with the new
+# set. Keys are case-insensitive; /key, /KEY and /key/ all match. Escape any
+# `$` in a URL as `$$`.
+name: hop
+
+configs:
+  hop_links:
+    content: |
+      linkedin=https://linkedin.com/in/baileybutler1
+      github=https://github.com/baely
+      slop=https://github.com/baely/slop
+
+services:
+  hop:
+    image: registry.baileys.dev/hop:latest
+    restart: unless-stopped
+    environment:
+      ADDR: ":8080"
+      LINKS: "/etc/hop/links.txt"
+      REDIRECT_STATUS: "302"
+    configs:
+      - source: hop_links
+        target: /etc/hop/links.txt
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.hop.rule=Host(`hop.baileys.dev`)
+      - traefik.http.services.hop.loadbalancer.server.port=8080
+      - baileys.public.url=https://hop.baileys.dev
+      - baileys.public.title=hop
+      - baileys.public.description=Short links
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
