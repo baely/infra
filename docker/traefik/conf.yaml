@@ -49,13 +49,6 @@ http:
         query: "/{status}.html"
 
 tls:
-  options:
-    # For TCP routers that terminate TLS in front of an HTTP/1.1-only backend
-    # (hop). Traefik's default ALPN list offers h2, and a browser that
-    # negotiated it would then send HTTP/2 frames down the raw pipe.
-    http1only:
-      alpnProtocols:
-        - http/1.1
   stores:
     default:
       defaultGeneratedCert:

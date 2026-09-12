@@ -1,51 +1,19 @@
 # Repo: https://github.com/baely/slop (hop/)
-# Ref: d4702a2ec5cf2c79d75a14060bdb479aa5e23237
-#
-# Links live inline below and are mounted over the image's sample file at
-# /etc/hop/links.txt. Edit a line, merge, and coach redeploys with the new
-# set. Keys are case-insensitive; /key, /KEY and /key/ all match. Escape any
-# `$` in a URL as `$$`.
+# Ref: 00358761e7b1e36345d44652e50e0fc7e7f419e8
 name: hop
-
-configs:
-  hop_links:
-    content: |
-      linkedin=https://linkedin.com/in/baileybutler1
-      github=https://github.com/baely
-      slop=https://github.com/baely/slop
 
 services:
   hop:
     image: registry.baileys.dev/hop:latest
     restart: unless-stopped
-    environment:
-      ADDR: ":8080"
-      LINKS: "/etc/hop/links.txt"
-      REDIRECT_STATUS: "302"
-    configs:
-      - source: hop_links
-        target: /etc/hop/links.txt
+    volumes:
+      - ./links.txt:/links.txt:ro
     labels:
       - traefik.enable=true
-      # TCP router: traefik terminates TLS by SNI on :443 and pipes the
-      # plaintext byte stream straight to hop, so hop parses exactly what the
-      # browser sent. ALPN is pinned to http/1.1 by the http1only TLS option
-      # in traefik/conf.yaml; with traefik's default h2 offer a browser would
-      # send HTTP/2 frames that hop answers with a 400.
       - traefik.tcp.routers.hop.entrypoints=websecure
       - traefik.tcp.routers.hop.rule=HostSNI(`hop.baileys.dev`)
       - traefik.tcp.routers.hop.tls=true
-      - traefik.tcp.routers.hop.tls.certresolver=dev
-      - traefik.tcp.routers.hop.tls.options=http1only@file
       - traefik.tcp.services.hop.loadbalancer.server.port=8080
-      # Plain HTTP on :80 has no SNI to match on, so an HTTP router bounces
-      # it to https without touching hop.
-      - traefik.http.routers.hop-http.entrypoints=web
-      - traefik.http.routers.hop-http.rule=Host(`hop.baileys.dev`)
-      - traefik.http.routers.hop-http.middlewares=hop-https@docker
-      - traefik.http.routers.hop-http.service=noop@internal
-      - traefik.http.middlewares.hop-https.redirectscheme.scheme=https
-      - traefik.http.middlewares.hop-https.redirectscheme.permanent=true
       - baileys.public.url=https://hop.baileys.dev
       - baileys.public.title=hop
       - baileys.public.description=Short links

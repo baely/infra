@@ -1,0 +1,9 @@
+# hop links — one per line as key=url. Blank lines and # comments are ignored.
+# Keys are case-insensitive and matched without surrounding slashes, so
+# /LinkedIn, /linkedin and /linkedin/ all resolve the same. Queries on the
+# incoming request are stripped before lookup. A key of "/" replaces the
+# index page with a redirect.
+
+linkedin=https://linkedin.com/in/baileybutler1
+github=https://github.com/baely
+slop=https://github.com/baely/slop
