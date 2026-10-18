@@ -6,7 +6,7 @@ networks:
 
 services:
   plex:
-    image: lscr.io/linuxserver/plex:1.43.3.10828-00f62d37d-ls315
+    image: lscr.io/linuxserver/plex:1.43.3.10896-cb3ebc72d-ls321
     container_name: plex
     network_mode: host
     environment:
@@ -24,7 +24,9 @@ services:
     restart: unless-stopped
 
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:10.11.11ubu2404-ls41
+    # Upstream image, not linuxserver: 12.x isn't on lscr yet. Its database is
+    # already migrated to 12.x, so going back to 10.11 needs a restore.
+    image: jellyfin/jellyfin:12.0-rc5
     container_name: jellyfin
     networks:
       - default
@@ -48,7 +50,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: lscr.io/linuxserver/radarr:6.3.0.10514-ls312
+    image: lscr.io/linuxserver/radarr:6.3.0.10514-ls313
     container_name: radarr
     networks:
       - default
@@ -69,7 +71,7 @@ services:
     restart: unless-stopped
 
   sonarr:
-    image: lscr.io/linuxserver/sonarr:4.0.19.2979-ls320
+    image: lscr.io/linuxserver/sonarr:4.0.19.2979-ls322
     container_name: sonarr
     networks:
       - default
@@ -90,7 +92,7 @@ services:
     restart: unless-stopped
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:2.4.0.5397-ls154
+    image: lscr.io/linuxserver/prowlarr:2.5.2.5491-ls156
     container_name: prowlarr
     networks:
       - default
@@ -130,7 +132,7 @@ services:
 
   autobrr:
     container_name: autobrr
-    image: ghcr.io/autobrr/autobrr:v1.82.1
+    image: ghcr.io/autobrr/autobrr:v1.84.0
     restart: unless-stopped
     networks:
       - default
@@ -149,7 +151,7 @@ services:
       - ${BASE_PATH}/autobrr/config:/config
 
   seerr:
-    image: ghcr.io/seerr-team/seerr:v3.3.0
+    image: ghcr.io/seerr-team/seerr:v3.4.1
     init: true
     container_name: seerr
     networks:
@@ -174,14 +176,18 @@ services:
   qbit-vpn:
     image: binhex/arch-qbittorrentvpn:5.2.3-3-01
     container_name: qbit-vpn
-    network_mode: bridge
+    mem_limit: 6g
+    memswap_limit: 6g
+    networks:
+      # `default` so the *arrs reach the webui by name; `web` for traefik
+      - default
+      - web
     labels:
-      # network_mode bridge can't join `web`; traefik is attached to bridge too
       - "traefik.enable=true"
       - "traefik.http.routers.qbit.rule=Host(`qbit.int.xbd.au`)"
       - "traefik.http.routers.qbit.middlewares=internal-only@file"
       - "traefik.http.services.qbit.loadbalancer.server.port=8090"
-      - "traefik.docker.network=bridge"
+      - "traefik.docker.network=web"
     cap_add:
       - NET_ADMIN
     environment:
@@ -196,7 +202,7 @@ services:
       - VPN_PROV=pia
       - VPN_CLIENT=wireguard
       - STRICT_PORT_FORWARD=yes
-      # docker ranges included so traefik (bridge, 172.17.x) can reach the webui
+      # docker ranges included so traefik and the *arrs (172.16.0.0/12) can reach the webui
       - LAN_NETWORK=192.168.0.0/24,172.16.0.0/12
       - ENABLE_STARTUP_SCRIPTS=no
       - NAME_SERVERS=1.1.1.1,1.0.0.1
@@ -216,7 +222,7 @@ services:
     restart: unless-stopped
 
   tautulli:
-    image: lscr.io/linuxserver/tautulli:v2.17.2-ls237
+    image: lscr.io/linuxserver/tautulli:v2.17.2-ls241
     container_name: tautulli
     networks:
       - default
@@ -234,6 +240,47 @@ services:
     volumes:
       - ${BASE_PATH}/tautulli/config:/config
     restart: unless-stopped
+
+  decluttarr:
+    image: ghcr.io/manimatter/decluttarr:latest@sha256:c06d48426b612b845f2406c2d045f266468a6390faf87aea796d497a2935ec95
+    container_name: decluttarr
+    restart: unless-stopped
+    networks:
+      - default
+    environment:
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${GUID}
+
+      LOG_LEVEL: INFO
+      TEST_RUN: "True" # Review the logs, then flip to "False" to let it actually remove/act
+      TIMER: 10
+
+      REMOVE_FAILED_DOWNLOADS: "True"
+      REMOVE_FAILED_IMPORTS: "True"
+      REMOVE_METADATA_MISSING: "True"
+      REMOVE_MISSING_FILES: "True"
+      REMOVE_ORPHANS: "True"
+      REMOVE_SLOW: "True"
+      REMOVE_STALLED: "True"
+      REMOVE_UNMONITORED: "True"
+      DETECT_DELETIONS: "True"
+
+      # API keys live in the server-side .env
+      SONARR: >
+        - base_url: "http://sonarr:8989"
+          api_key: "${SONARR_API_KEY}"
+
+      RADARR: >
+        - base_url: "http://radarr:7878"
+          api_key: "${RADARR_API_KEY}"
+
+      # QBITTORRENT: add this back once you have the WebUI password (or an API key, qBit 5.2+);
+      # the current admin password is PBKDF2-hashed in qBittorrent.conf and unrecoverable.
+      # QBITTORRENT: >
+      #   - base_url: "http://qbit-vpn:8090"
+      #     username: "admin"
+      #     password: "xxxx"
 
   wizarr:
     container_name: wizarr

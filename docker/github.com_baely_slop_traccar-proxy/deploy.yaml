@@ -1,0 +1,29 @@
+# Repo: https://github.com/baely/slop (traccar-proxy/)
+# Ref: bcdc873c1968edd3b2b7adcac1071d2298eff76e
+name: traccar-proxy
+
+services:
+  traccar-proxy:
+    image: registry.baileys.dev/traccar-proxy:latest
+    restart: unless-stopped
+    # TOKEN and TARGET_* live in .env (server-side only).
+    env_file: ".env"
+    environment:
+      ADDR: ":8080"
+      DATA_DIR: "/data"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traccar-proxy.rule=Host(`tp.xbd.au`)
+      - traefik.http.services.traccar-proxy.loadbalancer.server.port=8080
+      - traefik.docker.network=web
+    volumes:
+      - traccar-proxy-data:/data
+    networks:
+      - web
+
+volumes:
+  traccar-proxy-data:
+
+networks:
+  web:
+    external: true
