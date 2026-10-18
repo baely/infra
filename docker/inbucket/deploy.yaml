@@ -4,9 +4,8 @@ services:
   inbucket:
     image: inbucket/inbucket:3.1.1
     restart: always
-    ports:
-      # SMTP ingest stays published; traefik has no :25 entrypoint
-      - "25:2500"
+    # No published ports: postfix owns :25 and relays baileys.app/.dev mail
+    # here over postfix_mailnet (see docker/postfix).
     volumes:
       - /home/user/inbucket/config:/config
       - /home/user/inbucket/storage:/storage
@@ -22,7 +21,10 @@ services:
       - traefik.docker.network=web
     networks:
       - web
+      - postfix_mailnet
 
 networks:
   web:
+    external: true
+  postfix_mailnet:
     external: true

@@ -1,0 +1,41 @@
+# Repo: https://github.com/baely/slop (hop/)
+# Ref: a53bd48cc69c2b5572e6988cc6c447ce8adbdaa8
+name: hop
+
+services:
+  hop:
+    image: registry.baileys.dev/hop:latest
+    restart: unless-stopped
+    volumes:
+      # Absolute: coach runs compose from a temp dir, where ./data would not
+      # be the live links file.
+      - /home/user/manual-deploys/hop/data:/data:ro
+    labels:
+      - traefik.enable=true
+      - traefik.tcp.routers.hop.entrypoints=websecure
+      - traefik.tcp.routers.hop.rule=HostSNI(`bly.au`)
+      - traefik.tcp.routers.hop.tls=true
+      - traefik.tcp.services.hop.loadbalancer.server.port=8080
+      - baileys.public.url=https://bly.au
+      - baileys.public.title=hop
+      - baileys.public.description=Short links
+    networks:
+      - web
+
+  hop-writer:
+    image: registry.baileys.dev/hop-writer:latest
+    restart: unless-stopped
+    user: "1000:1000" # the host user, so data/links.txt stays hand-editable
+    volumes:
+      - /home/user/manual-deploys/hop/data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.hop-writer.rule=Host(`hop.int.xbd.au`)
+      - traefik.http.routers.hop-writer.middlewares=internal-only@file
+      - traefik.http.services.hop-writer.loadbalancer.server.port=8080
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

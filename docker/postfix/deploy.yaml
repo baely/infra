@@ -1,0 +1,42 @@
+# Mail router: owns :25 and relays by recipient over the postfix_mailnet
+# network. inbucket and shoebox join that network as external.
+#
+# Config and Dockerfile are inline (like redirector) because coach runs compose
+# from a temp dir that the host daemon can't bind-mount from.
+name: postfix
+
+configs:
+  main_cf:
+    content: |
+      myhostname = mx.xbd.au
+      mydestination =
+      relay_domains = baileys.app, baileys.dev, xbd.au
+      transport_maps = texthash:/etc/postfix/transport
+      relay_recipient_maps =
+      smtpd_relay_restrictions = permit_mynetworks, reject_unauth_destination
+      maillog_file = /dev/stdout
+  transport:
+    content: |
+      tax@baileys.dev smtp:[shoebox]:2525
+      baileys.app     smtp:[inbucket]:2500
+      baileys.dev     smtp:[inbucket]:2500
+
+services:
+  mail-router:
+    build:
+      dockerfile_inline: |
+        FROM alpine:3.24
+        RUN apk add --no-cache postfix
+        CMD ["postfix", "start-fg"]
+    restart: unless-stopped
+    ports: ["25:25"]
+    configs:
+      - source: main_cf
+        target: /etc/postfix/main.cf
+      - source: transport
+        target: /etc/postfix/transport
+    networks:
+      - mailnet
+
+networks:
+  mailnet: {}
