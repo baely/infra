@@ -4,17 +4,19 @@ services:
   jumpbox:
     image: lscr.io/linuxserver/webtop:ubuntu-xfce
     container_name: jumpbox
-    restart: "no"
+    restart: unless-stopped
     environment:
       PUID: "1000"
       PGID: "1000"
       TZ: Australia/Sydney
+      TITLE: box.selfrun.net
     volumes:
       - webtop:/config
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jump.rule=Host(`webtop.xbd.au`)
-      - traefik.http.routers.jump.middlewares=authentik-forward-auth@file
+      # Public only via the selfrun Cloudflare Tunnel, behind Cloudflare Access
+      - traefik.http.routers.jump.rule=Host(`box.selfrun.net`)
+      - traefik.http.routers.jump.entrypoints=tunnel
       - traefik.http.services.jump.loadbalancer.server.port=3000
       - traefik.docker.network=web
     networks:

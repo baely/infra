@@ -33,11 +33,15 @@ configs:
           caffeine-api.baileys.dev  baileyneeds.coffee;
 
           # baileys.dev -> xbd.au
-          jump.baileys.dev          webtop.xbd.au;
+          jump.baileys.dev          box.selfrun.net;
           traccar.baileys.dev       traccar.xbd.au;
           temporal.baileys.dev      temporal.int.xbd.au;
           analytics.baileys.dev     umami.int.xbd.au;
           services.baileys.dev      services.int.xbd.au;
+
+          # moved behind Cloudflare Access
+          webtop.xbd.au             box.selfrun.net;
+          jumpbox.selfrun.net       box.selfrun.net;
 
           # media/internal tier and staticer lab sites keep their subdomain
           ~^(?<sub>.+)\.home\.baileys\.app$  $${sub}.int.xbd.au;
@@ -63,7 +67,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.routers.redirector.rule=Host(`menu.baileys.app`) || Host(`notes.baileys.app`) || Host(`study.baileys.app`) || Host(`track.baileys.app`) || Host(`voyage.baileys.app`) || Host(`index.baileys.app`) || Host(`chat.baileys.app`) || Host(`photos.baileys.app`) || Host(`request.baileys.app`) || Host(`home.baileys.app`) || Host(`lab.baileys.app`) || Host(`caffeine.baileys.app`) || Host(`caffeine-api.baileys.dev`) || Host(`jump.baileys.dev`) || Host(`traccar.baileys.dev`) || Host(`temporal.baileys.dev`) || Host(`analytics.baileys.dev`) || Host(`services.baileys.dev`) || HostRegexp(`^.+\\.home\\.baileys\\.app$$`) || HostRegexp(`^.+\\.lab\\.baileys\\.app$$`)"
+      - "traefik.http.routers.redirector.rule=Host(`menu.baileys.app`) || Host(`notes.baileys.app`) || Host(`study.baileys.app`) || Host(`track.baileys.app`) || Host(`voyage.baileys.app`) || Host(`index.baileys.app`) || Host(`chat.baileys.app`) || Host(`photos.baileys.app`) || Host(`request.baileys.app`) || Host(`home.baileys.app`) || Host(`lab.baileys.app`) || Host(`caffeine.baileys.app`) || Host(`caffeine-api.baileys.dev`) || Host(`jump.baileys.dev`) || Host(`traccar.baileys.dev`) || Host(`temporal.baileys.dev`) || Host(`analytics.baileys.dev`) || Host(`services.baileys.dev`) || Host(`webtop.xbd.au`) || HostRegexp(`^.+\\.home\\.baileys\\.app$$`) || HostRegexp(`^.+\\.lab\\.baileys\\.app$$`)"
+      - "traefik.http.routers.redirector.service=redirector"
+      # selfrun.net hosts arrive via the Cloudflare Tunnel, not web/websecure
+      - "traefik.http.routers.redirector-tunnel.rule=Host(`jumpbox.selfrun.net`)"
+      - "traefik.http.routers.redirector-tunnel.entrypoints=tunnel"
+      - "traefik.http.routers.redirector-tunnel.service=redirector"
       - "traefik.http.services.redirector.loadbalancer.server.port=8080"
     networks:
       - web
