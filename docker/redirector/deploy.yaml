@@ -39,6 +39,9 @@ configs:
           analytics.baileys.dev     umami.int.xbd.au;
           services.baileys.dev      services.int.xbd.au;
 
+          # moved behind Cloudflare Access
+          webtop.xbd.au             jumpbox.selfrun.net;
+
           # media/internal tier and staticer lab sites keep their subdomain
           ~^(?<sub>.+)\.home\.baileys\.app$  $${sub}.int.xbd.au;
           ~^(?<sub>.+)\.lab\.baileys\.app$   $${sub}.lab.baileys.dev;
@@ -63,7 +66,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.routers.redirector.rule=Host(`menu.baileys.app`) || Host(`notes.baileys.app`) || Host(`study.baileys.app`) || Host(`track.baileys.app`) || Host(`voyage.baileys.app`) || Host(`index.baileys.app`) || Host(`chat.baileys.app`) || Host(`photos.baileys.app`) || Host(`request.baileys.app`) || Host(`home.baileys.app`) || Host(`lab.baileys.app`) || Host(`caffeine.baileys.app`) || Host(`caffeine-api.baileys.dev`) || Host(`jump.baileys.dev`) || Host(`traccar.baileys.dev`) || Host(`temporal.baileys.dev`) || Host(`analytics.baileys.dev`) || Host(`services.baileys.dev`) || HostRegexp(`^.+\\.home\\.baileys\\.app$$`) || HostRegexp(`^.+\\.lab\\.baileys\\.app$$`)"
+      - "traefik.http.routers.redirector.rule=Host(`menu.baileys.app`) || Host(`notes.baileys.app`) || Host(`study.baileys.app`) || Host(`track.baileys.app`) || Host(`voyage.baileys.app`) || Host(`index.baileys.app`) || Host(`chat.baileys.app`) || Host(`photos.baileys.app`) || Host(`request.baileys.app`) || Host(`home.baileys.app`) || Host(`lab.baileys.app`) || Host(`caffeine.baileys.app`) || Host(`caffeine-api.baileys.dev`) || Host(`jump.baileys.dev`) || Host(`traccar.baileys.dev`) || Host(`temporal.baileys.dev`) || Host(`analytics.baileys.dev`) || Host(`services.baileys.dev`) || Host(`webtop.xbd.au`) || HostRegexp(`^.+\\.home\\.baileys\\.app$$`) || HostRegexp(`^.+\\.lab\\.baileys\\.app$$`)"
       - "traefik.http.services.redirector.loadbalancer.server.port=8080"
     networks:
       - web
