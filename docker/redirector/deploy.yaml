@@ -33,14 +33,14 @@ configs:
           caffeine-api.baileys.dev  baileyneeds.coffee;
 
           # baileys.dev -> xbd.au
-          jump.baileys.dev          jumpbox.selfrun.net;
+          jump.baileys.dev          box.selfrun.net;
           traccar.baileys.dev       traccar.xbd.au;
           temporal.baileys.dev      temporal.int.xbd.au;
           analytics.baileys.dev     umami.int.xbd.au;
           services.baileys.dev      services.int.xbd.au;
 
           # moved behind Cloudflare Access
-          webtop.xbd.au             jumpbox.selfrun.net;
+          webtop.xbd.au             box.selfrun.net;
 
           # media/internal tier and staticer lab sites keep their subdomain
           ~^(?<sub>.+)\.home\.baileys\.app$  $${sub}.int.xbd.au;
