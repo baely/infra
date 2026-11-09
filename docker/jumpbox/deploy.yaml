@@ -4,7 +4,7 @@ services:
   jumpbox:
     image: lscr.io/linuxserver/webtop:ubuntu-xfce
     container_name: jumpbox
-    restart: "no"
+    restart: unless-stopped
     environment:
       PUID: "1000"
       PGID: "1000"
