@@ -13,8 +13,9 @@ services:
       - webtop:/config
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jump.rule=Host(`webtop.xbd.au`)
-      - traefik.http.routers.jump.middlewares=authentik-forward-auth@file
+      # Public only via the selfrun Cloudflare Tunnel, behind Cloudflare Access
+      - traefik.http.routers.jump.rule=Host(`jumpbox.selfrun.net`)
+      - traefik.http.routers.jump.entrypoints=tunnel
       - traefik.http.services.jump.loadbalancer.server.port=3000
       - traefik.docker.network=web
     networks:

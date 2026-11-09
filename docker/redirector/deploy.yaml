@@ -33,7 +33,7 @@ configs:
           caffeine-api.baileys.dev  baileyneeds.coffee;
 
           # baileys.dev -> xbd.au
-          jump.baileys.dev          webtop.xbd.au;
+          jump.baileys.dev          jumpbox.selfrun.net;
           traccar.baileys.dev       traccar.xbd.au;
           temporal.baileys.dev      temporal.int.xbd.au;
           analytics.baileys.dev     umami.int.xbd.au;
